@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * UserLoginController - REST endpoints for user login management
+ * All endpoints require ROLE_ADMIN authentication
  */
 @RestController
 @RequestMapping("/api/v1/user-logins")
@@ -24,6 +26,7 @@ public class UserLoginController {
     private final UserLoginService service;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get all user logins")
     public ResponseEntity<List<UserLoginDTO>> getAll() {
@@ -31,6 +34,7 @@ public class UserLoginController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get user login by ID")
     public ResponseEntity<UserLoginDTO> getById(@PathVariable String id) {
@@ -38,6 +42,7 @@ public class UserLoginController {
     }
 
     @GetMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get user login by username")
     public ResponseEntity<UserLoginDTO> getByUsername(@PathVariable String username) {
@@ -45,6 +50,7 @@ public class UserLoginController {
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get user login by email")
     public ResponseEntity<UserLoginDTO> getByEmail(@PathVariable String email) {
@@ -52,6 +58,7 @@ public class UserLoginController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Create new user login")
     public ResponseEntity<UserLoginDTO> create(@RequestBody UserLoginDTO dto) {
@@ -59,6 +66,7 @@ public class UserLoginController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Update user login")
     public ResponseEntity<UserLoginDTO> update(@PathVariable String id, @RequestBody UserLoginDTO dto) {
@@ -66,6 +74,7 @@ public class UserLoginController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Delete user login")
     public ResponseEntity<Void> delete(@PathVariable String id) {
