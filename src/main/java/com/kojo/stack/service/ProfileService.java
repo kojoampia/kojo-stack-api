@@ -3,6 +3,7 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.ProfileDTO;
 import com.kojo.stack.domain.model.Profile;
 import com.kojo.stack.domain.repository.ProfileRepository;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,6 +26,7 @@ public class ProfileService {
 
     private final ProfileRepository repository;
 
+    @Timed
     @Cacheable(value = "profiles")
     public List<ProfileDTO> getAll() {
         log.info("Fetching all profiles");
@@ -33,6 +35,7 @@ public class ProfileService {
                 .collect(Collectors.toList());
     }
 
+    @Timed
     @Cacheable(value = "profile", key = "#id")
     public ProfileDTO getById(String id) {
         log.info("Fetching profile with id: {}", id);
@@ -41,6 +44,7 @@ public class ProfileService {
                 .orElseThrow(() -> new RuntimeException("Profile not found: " + id));
     }
 
+    @Timed
     public ProfileDTO getByEmail(String email) {
         log.info("Fetching profile with email: {}", email);
         return repository.findByEmail(email)
@@ -48,6 +52,7 @@ public class ProfileService {
                 .orElseThrow(() -> new RuntimeException("Profile not found for email: " + email));
     }
 
+    @Timed
     @Transactional
     @CacheEvict(value = "profiles", allEntries = true)
     public ProfileDTO create(ProfileDTO dto) {
@@ -57,6 +62,7 @@ public class ProfileService {
         return toDTO(saved);
     }
 
+    @Timed
     @Transactional
     @CacheEvict(value = {"profiles", "profile"}, allEntries = true)
     public ProfileDTO update(String id, ProfileDTO dto) {
@@ -74,6 +80,7 @@ public class ProfileService {
         return toDTO(repository.save(entity));
     }
 
+    @Timed
     @Transactional
     @CacheEvict(value = {"profiles", "profile"}, allEntries = true)
     public void delete(String id) {
