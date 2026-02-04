@@ -1,0 +1,103 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # MongoDB Configuration (Production - via Environment Variables)
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USER:admin}:${MONGODB_PASSWORD:changeme}@${MONGODB_HOST:mongodb.example.com}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:kojo-stack}?authSource=admin&ssl=true&retryWrites=true&w=majority
+      auto-index-creation: false
+
+  # Redis Configuration (Production - Cluster/Sentinel)
+  redis:
+    host: ${REDIS_HOST:redis.example.com}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 5000ms
+    ssl: ${REDIS_SSL:false}
+    jedis:
+      pool:
+        max-active: 16
+        max-idle: 8
+        min-idle: 4
+
+  # Kafka Configuration (Production - Broker Cluster)
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}
+    producer:
+      acks: all
+      retries: 5
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      compression-type: snappy
+      batch-size: 16384
+      linger-ms: 100
+    consumer:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}
+      group-id: kojo-stack-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      max-poll-records: 500
+      properties:
+        spring.json.trusted.packages: "*"
+
+# Production Logging (Minimal, Performance Focused)
+logging:
+  level:
+    root: WARN
+    com.kojo.stack: INFO
+    org.springframework.web: WARN
+    org.springframework.data.mongodb: WARN
+    org.springframework.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /var/log/kojo-stack-api/kojo-stack-api.log
+    max-size: 100MB
+    max-history: 30
+    total-size-cap: 10GB
+
+# Production Server Config
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    min-response-size: 2048
+  error:
+    include-stacktrace: never
+    include-message: on_param
+    include-exception: false
+  shutdown: graceful
+
+# Production Actuator (Limited endpoints)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Application Properties
+app:
+  db:
+    init-data: false
+  security:
+    enable-cors: true
+    cors-origins: ${CORS_ORIGINS:}

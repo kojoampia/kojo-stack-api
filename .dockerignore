@@ -1,0 +1,63 @@
+# .dockerignore - Optimize Docker build context
+
+# Version control
+.git
+.gitignore
+.github
+
+# Build artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+.m2/
+.maven/
+
+# Gradle
+.gradle/
+build/
+
+# Node (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Testing
+coverage/
+.nyc_output/
+
+# Documentation
+README.md
+CONTRIBUTING.md
+LICENSE
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.circleci/
