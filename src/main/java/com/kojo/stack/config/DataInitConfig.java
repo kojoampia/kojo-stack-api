@@ -7,8 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.List;
 
 /**
@@ -24,11 +26,20 @@ public class DataInitConfig {
     private final ProjectRepository projectRepository;
     private final DocRepository docRepository;
     private final SkillRepository skillRepository;
+    private final AuthorityRepository authorityRepository;
+    private final UserLoginRepository userLoginRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner initializeData() {
         return args -> {
-            // Only initialize if empty
+            // Initialize authorities first
+            initializeAuthorities();
+            
+            // Initialize user with admin role
+            initializeAdminUser();
+            
+            // Only initialize other data if empty
             if (experienceRepository.count() > 0) {
                 return;
             }
@@ -38,6 +49,43 @@ public class DataInitConfig {
             initializeProjects();
             initializeDocumentation();
         };
+    }
+
+    private void initializeAuthorities() {
+        // Only initialize if empty
+        if (authorityRepository.count() > 0) {
+            return;
+        }
+
+        List<Authority> authorities = List.of(
+                Authority.builder().name("ROLE_ADMIN").build(),
+                Authority.builder().name("ROLE_USER").build(),
+                Authority.builder().name("ROLE_VIEWER").build()
+        );
+        authorityRepository.saveAll(authorities);
+    }
+
+    private void initializeAdminUser() {
+        // Only initialize if admin doesn't exist
+        if (userLoginRepository.findByUsername("admin").isPresent()) {
+            return;
+        }
+
+        // Get the ADMIN authority
+        Authority adminAuthority = authorityRepository.findByName("ROLE_ADMIN")
+                .orElseGet(() -> authorityRepository.save(
+                        Authority.builder().name("ROLE_ADMIN").build()
+                ));
+
+        // Create default admin user
+        UserLogin adminUser = UserLogin.builder()
+                .username("admin")
+                .email("admin@jojoaddison.net")
+                .password(passwordEncoder.encode("admin123"))
+                .authorities(Set.of(adminAuthority))
+                .build();
+
+        userLoginRepository.save(adminUser);
     }
 
     private void initializeExperiences() {

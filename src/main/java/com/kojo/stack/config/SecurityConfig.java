@@ -65,6 +65,7 @@ public class SecurityConfig {
 
                 // Configure authorization rules
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         // Public endpoints - permit all GET requests
                         .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health", "/actuator/**").permitAll()
