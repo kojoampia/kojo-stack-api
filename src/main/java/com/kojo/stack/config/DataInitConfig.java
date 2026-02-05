@@ -27,7 +27,7 @@ public class DataInitConfig {
     private final DocRepository docRepository;
     private final SkillRepository skillRepository;
     private final AuthorityRepository authorityRepository;
-    private final UserLoginRepository userLoginRepository;
+    private final AccountRepository AccountRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -67,25 +67,29 @@ public class DataInitConfig {
 
     private void initializeAdminUser() {
         // Only initialize if admin doesn't exist
-        if (userLoginRepository.findByUsername("admin").isPresent()) {
-            return;
-        }
+        // if (AccountRepository.findByLogin("admin").isPresent()) {
+        //    return;
+        // }
 
+        // Check if admin authority exists
         // Get the ADMIN authority
         Authority adminAuthority = authorityRepository.findByName("ROLE_ADMIN")
                 .orElseGet(() -> authorityRepository.save(
                         Authority.builder().name("ROLE_ADMIN").build()
                 ));
 
+        
+        AccountRepository.deleteAll();        
+
         // Create default admin user
-        UserLogin adminUser = UserLogin.builder()
-                .username("admin")
+        Account adminUser = Account.builder()
+                .login("admin")
                 .email("admin@jojoaddison.net")
-                .password(passwordEncoder.encode("admin123"))
+                .password(passwordEncoder.encode("Moba1992!"))
                 .authorities(Set.of(adminAuthority))
                 .build();
 
-        userLoginRepository.save(adminUser);
+        AccountRepository.save(adminUser);
     }
 
     private void initializeExperiences() {

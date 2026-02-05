@@ -1,7 +1,7 @@
 package com.kojo.stack.api.controller;
 
-import com.kojo.stack.api.dto.UserLoginDTO;
-import com.kojo.stack.service.UserLoginService;
+import com.kojo.stack.api.dto.AccountDTO;
+import com.kojo.stack.service.AccountService;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,22 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * UserLoginController - REST endpoints for user login management
+ * AccountController - REST endpoints for user login management
  * All endpoints require ROLE_ADMIN authentication
  */
 @RestController
 @RequestMapping("/api/v1/user-logins")
 @RequiredArgsConstructor
 @Tag(name = "User Logins", description = "User login credentials and authorities management endpoints")
-public class UserLoginController {
+public class AccountController {
 
-    private final UserLoginService service;
+    private final AccountService service;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get all user logins")
-    public ResponseEntity<List<UserLoginDTO>> getAll() {
+    public ResponseEntity<List<AccountDTO>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
@@ -37,23 +37,23 @@ public class UserLoginController {
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get user login by ID")
-    public ResponseEntity<UserLoginDTO> getById(@PathVariable String id) {
+    public ResponseEntity<AccountDTO> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @GetMapping("/username/{username}")
+    @GetMapping("/login/{login}")
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
-    @Operation(summary = "Get user login by username")
-    public ResponseEntity<UserLoginDTO> getByUsername(@PathVariable String username) {
-        return ResponseEntity.ok(service.getByUsername(username));
+    @Operation(summary = "Get user login by login")
+    public ResponseEntity<AccountDTO> getByLogin(@PathVariable String login) {
+        return ResponseEntity.ok(service.getByLogin(login));
     }
 
     @GetMapping("/email/{email}")
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get user login by email")
-    public ResponseEntity<UserLoginDTO> getByEmail(@PathVariable String email) {
+    public ResponseEntity<AccountDTO> getByEmail(@PathVariable String email) {
         return ResponseEntity.ok(service.getByEmail(email));
     }
 
@@ -61,7 +61,7 @@ public class UserLoginController {
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Create new user login")
-    public ResponseEntity<UserLoginDTO> create(@RequestBody UserLoginDTO dto) {
+    public ResponseEntity<AccountDTO> create(@RequestBody AccountDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
@@ -69,7 +69,7 @@ public class UserLoginController {
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Update user login")
-    public ResponseEntity<UserLoginDTO> update(@PathVariable String id, @RequestBody UserLoginDTO dto) {
+    public ResponseEntity<AccountDTO> update(@PathVariable String id, @RequestBody AccountDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

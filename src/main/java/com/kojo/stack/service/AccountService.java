@@ -1,11 +1,11 @@
 package com.kojo.stack.service;
 
 import com.kojo.stack.api.dto.AuthorityDTO;
-import com.kojo.stack.api.dto.UserLoginDTO;
+import com.kojo.stack.api.dto.AccountDTO;
 import com.kojo.stack.domain.model.Authority;
-import com.kojo.stack.domain.model.UserLogin;
+import com.kojo.stack.domain.model.Account;
 import com.kojo.stack.domain.repository.AuthorityRepository;
-import com.kojo.stack.domain.repository.UserLoginRepository;
+import com.kojo.stack.domain.repository.AccountRepository;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,70 +20,70 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * UserLoginService - Business logic for user login management
+ * AccountService - Business logic for user login management
  * Handles CRUD operations for user credentials and authorities
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class UserLoginService {
+public class AccountService {
 
-    private final UserLoginRepository userLoginRepository;
+    private final AccountRepository AccountRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Timed
-    @Cacheable(value = "userLogins")
-    public List<UserLoginDTO> getAll() {
+    @Cacheable(value = "Accounts")
+    public List<AccountDTO> getAll() {
         log.info("Fetching all user logins");
-        return userLoginRepository.findAll().stream()
+        return AccountRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Timed
-    @Cacheable(value = "userLogin", key = "#id")
-    public UserLoginDTO getById(String id) {
+    @Cacheable(value = "Account", key = "#id")
+    public AccountDTO getById(String id) {
         log.info("Fetching user login with id: {}", id);
-        return userLoginRepository.findById(id)
+        return AccountRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("User login not found: " + id));
     }
 
     @Timed
-    public UserLoginDTO getByUsername(String username) {
-        log.info("Fetching user login by username: {}", username);
-        return userLoginRepository.findByUsername(username)
+    public AccountDTO getByLogin(String login) {
+        log.info("Fetching user login by login: {}", login);
+        return AccountRepository.findByLogin(login)
                 .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("User login not found for username: " + username));
+                .orElseThrow(() -> new RuntimeException("User login not found for login: " + login));
     }
 
     @Timed
-    public UserLoginDTO getByEmail(String email) {
+    public AccountDTO getByEmail(String email) {
         log.info("Fetching user login by email: {}", email);
-        return userLoginRepository.findByEmail(email)
+        return AccountRepository.findByEmail(email)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("User login not found for email: " + email));
     }
 
     @Timed
     @Transactional
-    @CacheEvict(value = "userLogins", allEntries = true)
-    public UserLoginDTO create(UserLoginDTO dto) {
-        log.info("Creating new user login for username: {}", dto.getUsername());
+    @CacheEvict(value = "Accounts", allEntries = true)
+    public AccountDTO create(AccountDTO dto) {
+        log.info("Creating new user login for login: {}", dto.getLogin());
         
-        // Check if username already exists
-        if (userLoginRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists: " + dto.getUsername());
+        // Check if login already exists
+        if (AccountRepository.findByLogin(dto.getLogin()).isPresent()) {
+            throw new RuntimeException("Login already exists: " + dto.getLogin());
         }
         
         // Check if email already exists
-        if (userLoginRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (AccountRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists: " + dto.getEmail());
         }
         
-        UserLogin entity = toEntity(dto);
+        Account entity = toEntity(dto);
         
         // Encode password
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -102,20 +102,20 @@ public class UserLoginService {
             entity.setAuthorities(authorities);
         }
         
-        UserLogin saved = userLoginRepository.save(entity);
+        Account saved = AccountRepository.save(entity);
         return toDTO(saved);
     }
 
     @Timed
     @Transactional
-    @CacheEvict(value = {"userLogins", "userLogin"}, allEntries = true)
-    public UserLoginDTO update(String id, UserLoginDTO dto) {
+    @CacheEvict(value = {"Accounts", "Account"}, allEntries = true)
+    public AccountDTO update(String id, AccountDTO dto) {
         log.info("Updating user login with id: {}", id);
         
-        UserLogin entity = userLoginRepository.findById(id)
+        Account entity = AccountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User login not found: " + id));
         
-        entity.setUsername(dto.getUsername());
+        entity.setLogin(dto.getLogin());
         entity.setEmail(dto.getEmail());
         
         // Only update password if provided
@@ -137,19 +137,19 @@ public class UserLoginService {
             entity.setAuthorities(authorities);
         }
         
-        return toDTO(userLoginRepository.save(entity));
+        return toDTO(AccountRepository.save(entity));
     }
 
     @Timed
     @Transactional
-    @CacheEvict(value = {"userLogins", "userLogin"}, allEntries = true)
+    @CacheEvict(value = {"Accounts", "Account"}, allEntries = true)
     public void delete(String id) {
         log.info("Deleting user login with id: {}", id);
-        userLoginRepository.deleteById(id);
+        AccountRepository.deleteById(id);
     }
 
     // Mapper methods
-    private UserLoginDTO toDTO(UserLogin entity) {
+    private AccountDTO toDTO(Account entity) {
         Set<AuthorityDTO> authorityDTOs = null;
         if (entity.getAuthorities() != null) {
             authorityDTOs = entity.getAuthorities().stream()
@@ -160,21 +160,31 @@ public class UserLoginService {
                     .collect(Collectors.toSet());
         }
         
-        return UserLoginDTO.builder()
+        return AccountDTO.builder()
                 .id(entity.getId())
-                .username(entity.getUsername())
+                .login(entity.getLogin())
                 .email(entity.getEmail())
                 .password(entity.getPassword())
                 .authorities(authorityDTOs)
+                .activated(entity.isActivated())
+                .firstName(entity.getFirstName())
+                .lastName(entity.getLastName())
+                .langKey(entity.getLangKey())
+                .imageUrl(entity.getImageUrl())
                 .build();
     }
 
-    private UserLogin toEntity(UserLoginDTO dto) {
-        return UserLogin.builder()
+    private Account toEntity(AccountDTO dto) {
+        return Account.builder()
                 .id(dto.getId())
-                .username(dto.getUsername())
+                .login(dto.getLogin())
                 .email(dto.getEmail())
                 .password(dto.getPassword())
+                .activated(dto.isActivated())
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .langKey(dto.getLangKey())
+                .imageUrl(dto.getImageUrl())
                 .build();
     }
 }

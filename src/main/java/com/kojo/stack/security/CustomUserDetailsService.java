@@ -1,7 +1,7 @@
 package com.kojo.stack.security;
 
-import com.kojo.stack.domain.model.UserLogin;
-import com.kojo.stack.domain.repository.UserLoginRepository;
+import com.kojo.stack.domain.model.Account;
+import com.kojo.stack.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * CustomUserDetailsService - Loads user details from MongoDB UserLoginRepository
+ * CustomUserDetailsService - Loads user details from MongoDB AccountRepository
  * Implements Spring Security's UserDetailsService for database-backed authentication
  */
 @Service
@@ -23,22 +23,22 @@ import java.util.Set;
 @Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserLoginRepository userLoginRepository;
+    private final AccountRepository accountRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.debug("Loading user details for username: {}", username);
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        log.debug("Loading user details for login: {}", login);
 
-        UserLogin userLogin = userLoginRepository.findByUsername(username)
+        Account account = accountRepository.findByLogin(login)
                 .orElseThrow(() -> {
-                    log.warn("User not found: {}", username);
-                    return new UsernameNotFoundException("User not found: " + username);
+                    log.warn("User not found: {}", login);
+                    return new UsernameNotFoundException("User not found: " + login);
                 });
 
         // Convert Authority entities to Spring Security GrantedAuthority
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        if (userLogin.getAuthorities() != null) {
-            userLogin.getAuthorities().forEach(auth ->
+        if (account.getAuthorities() != null) {
+            account.getAuthorities().forEach(auth ->
                     authorities.add(new SimpleGrantedAuthority(auth.getName()))
             );
         }
@@ -46,8 +46,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.debug("User found with authorities: {}", authorities);
 
         return User.builder()
-                .username(userLogin.getUsername())
-                .password(userLogin.getPassword())
+                .username(account.getLogin())
+                .password(account.getPassword())
                 .authorities(authorities)
                 .accountExpired(false)
                 .accountLocked(false)

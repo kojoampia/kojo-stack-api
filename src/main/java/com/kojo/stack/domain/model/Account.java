@@ -9,25 +9,37 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * UserLogin - MongoDB document for user login credentials and authorities
+ * Account - MongoDB document for user login credentials and authorities
  */
 @Document(collection = "user_logins")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLogin implements Serializable {
+public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
 
-    private String username;
+    private String login;
 
     private String email;
 
     private String password;
+
+    private String firstName;
+
+    private String lastName;
+
+    private boolean activated;
+
+    private String langKey;
+
+    private String imageUrl;
+
+
 
     @DBRef
     private Set<Authority> authorities;

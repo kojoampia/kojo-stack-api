@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * UserLoginDTO - Data Transfer Object for UserLogin
+ * AccountDTO - Data Transfer Object for Account
  * Used for REST API requests/responses
  */
 @Data
@@ -15,15 +15,15 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "User login credentials and authorities")
-public class UserLoginDTO implements Serializable {
+public class AccountDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Unique identifier", example = "user-001")
     private String id;
 
-    @Schema(description = "Username", example = "admin")
-    private String username;
+    @Schema(description = "Login", example = "admin")
+    private String login;
 
     @Schema(description = "Email address", example = "admin@example.com")
     private String email;
@@ -33,6 +33,22 @@ public class UserLoginDTO implements Serializable {
 
     @Schema(description = "Set of authorities/roles")
     private Set<AuthorityDTO> authorities;
+
+    @Schema(description = "First name", example = "John")
+    private String firstName;
+
+    @Schema(description = "Last name", example = "Doe")
+    private String lastName;
+
+    @Schema(description = "Account activation status", example = "true")
+    private boolean activated;
+
+    @Schema(description = "Language key", example = "en")
+    private String langKey;
+
+    @Schema(description = "Image URL", example = "http://example.com/image.png")
+    private String imageUrl;
+
 
     /**
      * Get authorities as a string array of authority names
