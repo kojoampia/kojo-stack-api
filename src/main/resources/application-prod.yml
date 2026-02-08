@@ -9,19 +9,6 @@ spring:
       uri: mongodb://${MONGODB_USER:admin}:${MONGODB_PASSWORD:changeme}@${MONGODB_HOST:mongodb.example.com}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:kojo-stack}?authSource=admin&ssl=true&retryWrites=true&w=majority
       auto-index-creation: false
 
-  # Redis Configuration (Production - Cluster/Sentinel)
-  redis:
-    host: ${REDIS_HOST:redis.example.com}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
-    timeout: 5000ms
-    ssl: ${REDIS_SSL:false}
-    jedis:
-      pool:
-        max-active: 16
-        max-idle: 8
-        min-idle: 4
-
   # Kafka Configuration (Production - Broker Cluster)
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092}

@@ -3,11 +3,11 @@ spring:
     name: kojo-stack-api
     version: 2026.1.0
 
-  # Cache Configuration
+  # Cache Configuration (Ehcache - In-Memory)
   cache:
-    type: redis
-    redis:
-      time-to-live: 3600000  # 1 hour
+    type: jcache
+    jcache:
+      config: classpath:ehcache.xml
 
   # Servlet Configuration
   servlet:

@@ -9,17 +9,6 @@ spring:
       uri: mongodb://localhost:27017/kojo-stack
       auto-index-creation: true
 
-  # Redis Configuration (Local Development)
-  redis:
-    host: localhost
-    port: 6379
-    timeout: 2000ms
-    jedis:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
-
   # Kafka Configuration (Local Development)
   kafka:
     bootstrap-servers: localhost:9092

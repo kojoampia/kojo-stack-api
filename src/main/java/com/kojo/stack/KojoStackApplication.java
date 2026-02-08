@@ -4,7 +4,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -19,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * - Domain Models (JPA Entities)
  * - DTOs (Data Transfer Objects)
  * - Event-Driven Architecture (Kafka)
- * - Caching Layer (Redis)
+ * - Caching Layer (Ehcache - In-Memory)
  * - API Documentation (OpenAPI/Swagger)
  *
  * Technologies:
@@ -27,14 +26,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * - Spring Boot 3.2
  * - Spring Data JPA (PostgreSQL/MongoDB)
  * - Spring Kafka (Event Streaming)
- * - Spring Cache (Redis)
+ * - Spring Cache (Ehcache)
  * - Lombok (Boilerplate Reduction)
  * - MapStruct (DTO Mapping)
  * - OpenAPI 3.0 (API Documentation)
  */
 @SpringBootApplication
 @EnableKafka
-@EnableCaching
 @EnableAsync
 public class KojoStackApplication {
 
