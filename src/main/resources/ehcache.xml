@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xsi:noNamespaceSchemaLocation="http://www.ehcache.org/schema/ehcache-core-3.10.xsd">
+
+    <!--
+        Ehcache 3 Configuration for Kojo Stack API
+        Replaces Redis with lightweight in-memory caching.
+        All caches use a 1-hour TTL and heap-only storage.
+    -->
+
+    <!-- Default cache template: 500 entries, 1 hour TTL -->
+    <cache-template name="default">
+        <expiry>
+            <ttl unit="hours">1</ttl>
+        </expiry>
+        <heap unit="entries">500</heap>
+    </cache-template>
+
+    <!-- Project caches -->
+    <cache alias="projects" uses-template="default"/>
+    <cache alias="activeProjects" uses-template="default"/>
+
+    <!-- Experience caches -->
+    <cache alias="experiences" uses-template="default"/>
+    <cache alias="activeExperiences" uses-template="default"/>
+
+    <!-- Account caches -->
+    <cache alias="Accounts" uses-template="default"/>
+    <cache alias="Account" uses-template="default"/>
+
+    <!-- Authority caches -->
+    <cache alias="authorities" uses-template="default"/>
+    <cache alias="authority" uses-template="default"/>
+
+    <!-- Settings cache -->
+    <cache alias="settings" uses-template="default"/>
+
+    <!-- Skill caches -->
+    <cache alias="skills" uses-template="default"/>
+    <cache alias="skillsByCategory" uses-template="default"/>
+
+    <!-- Education caches -->
+    <cache alias="education" uses-template="default"/>
+    <cache alias="educationByType" uses-template="default"/>
+
+    <!-- Profile caches -->
+    <cache alias="profiles" uses-template="default"/>
+    <cache alias="profile" uses-template="default"/>
+
+    <!-- Documentation caches -->
+    <cache alias="docs" uses-template="default"/>
+    <cache alias="docsByType" uses-template="default"/>
+
+</config>
