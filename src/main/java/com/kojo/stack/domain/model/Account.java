@@ -39,6 +39,10 @@ public class Account implements Serializable {
 
     private String imageUrl;
 
+    private String activationKey;
+
+    private String resetKey;
+
 
 
     @DBRef

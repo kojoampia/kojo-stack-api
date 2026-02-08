@@ -58,7 +58,8 @@ public class Experience implements Serializable {
         DEPRECATED,
         RETIRED,
         RESOLVED,
-        OPEN
+        OPEN,
+        STABLE
     }
 
     @Data

@@ -18,9 +18,9 @@ import java.util.List;
  * All endpoints require ROLE_ADMIN authentication
  */
 @RestController
-@RequestMapping("/api/v1/user-logins")
+@RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
-@Tag(name = "User Logins", description = "User login credentials and authorities management endpoints")
+@Tag(name = "User Accounts", description = "User account credentials and authorities management endpoints")
 public class AccountController {
 
     private final AccountService service;

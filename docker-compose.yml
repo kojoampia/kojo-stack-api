@@ -1,5 +1,4 @@
-version: '3.8'
-
+name: kojo-stack
 services:
   # Spring Boot Backend API
   kojo-stack-api:
@@ -11,18 +10,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: kojo_stack
-      DB_USER: kojo
-      DB_PASSWORD: kojo123
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      - postgres
-      - redis
-      - kafka
+      JWT_SECRET: DilDo2Disz4k1PJ1sGgP7X68rGYX0moWmuo2ETUUS+iuV0wBnLKrPSV26bGzbEGV0AQX4mkafBAOoQ+pu04cPbcwfLOrkIPHnFMrFjsZhM+Z8dc7kLDnimYJVPSXXmq1u8WJcRsNeOjHBvZ9rv7pyYPxbDI+XXagqgqFrVtA6QnieA7PppoVxnU5ygyI9F8R/T+Uir2kXbkd8dkmi3NBw5JVTa1VGOJzD2Tx+KRgnujCpLeDlp81QM7ETPA3JQ8xXcq+0aVJCksiX9PGM8CYSN72BJvbGZJfK5IzWW7aWuSZxwRN8ajInS5pzSSi3qJYbyHNLs8cFHPl0U5LXw==
     networks:
       - kojo-network
     restart: unless-stopped
@@ -32,71 +20,6 @@ services:
       timeout: 3s
       retries: 3
       start_period: 10s
-
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: kojo-stack-postgres
-    environment:
-      POSTGRES_DB: kojo_stack
-      POSTGRES_USER: kojo
-      POSTGRES_PASSWORD: kojo123
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - kojo-network
-    restart: unless-stopped
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: kojo-stack-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - kojo-network
-    restart: unless-stopped
-
-  # Kafka Broker
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: kojo-stack-kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-    depends_on:
-      - zookeeper
-    networks:
-      - kojo-network
-    restart: unless-stopped
-
-  # Zookeeper (required by Kafka)
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: kojo-stack-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    networks:
-      - kojo-network
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data:
 
 networks:
   kojo-network:

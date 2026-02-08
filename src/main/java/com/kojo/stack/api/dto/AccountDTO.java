@@ -49,6 +49,12 @@ public class AccountDTO implements Serializable {
     @Schema(description = "Image URL", example = "http://example.com/image.png")
     private String imageUrl;
 
+    @Schema(description = "Activation key", example = "abc123def456")
+    private String activationKey;
+
+    @Schema(description = "Reset key", example = "reset123def456")
+    private String resetKey;
+
 
     /**
      * Get authorities as a string array of authority names
