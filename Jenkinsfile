@@ -17,13 +17,15 @@ pipeline {
     }
 
     stages {
+        /**
+        Checkout not necessary in this build 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/kojoampia/kojo-stack.git',
+                git url: 'https://github.com/kojoampia/kojo-stack-api.git',
                 branch: 'main',
                 credentialsId: GIT_CREDENTIALS_ID
             }
-        }
+        }**/
         stage('Build and Push Docker Image') {
             steps {
                 script {
