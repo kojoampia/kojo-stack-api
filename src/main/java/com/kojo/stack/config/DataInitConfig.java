@@ -85,9 +85,9 @@ public class DataInitConfig {
 
         // Create default admin user
         Account adminUser = Account.builder()
-                .login("admin")
-                .email("admin@jojoaddison.net")
-                .password(passwordEncoder.encode("Moba1992!"))
+                .login("kojo")
+                .email("kojo@jojoaddison.net")
+                .password(passwordEncoder.encode("***REMOVED-CREDENTIAL***")) // :P Try to guess the production password :D
                 .authorities(Set.of(adminAuthority))
                 .build();
 

@@ -26,4 +26,6 @@ public class Settings implements Serializable {
     private Boolean betaFeatures;
 
     private String theme;
+
+    private String language;
 }

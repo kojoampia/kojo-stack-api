@@ -29,4 +29,7 @@ public class SettingsDTO implements Serializable {
 
     @Schema(description = "UI theme", example = "default")
     private String theme;
+
+    @Schema(description = "Preferred language", example = "en")
+    private String language;
 }

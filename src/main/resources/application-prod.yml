@@ -6,7 +6,7 @@ spring:
   # MongoDB Configuration (Production - via Environment Variables)
   data:
     mongodb:
-      uri: mongodb://${MONGODB_USER:admin}:${MONGODB_PASSWORD:changeme}@${MONGODB_HOST:mongodb.example.com}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:kojo-stack}?authSource=admin&ssl=true&retryWrites=true&w=majority
+      uri: mongodb://${MONGODB_HOST:mongodb}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:kojo-stack}?retryWrites=true&w=majority
       auto-index-creation: false
 
   # Kafka Configuration (Production - Broker Cluster)

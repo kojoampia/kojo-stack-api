@@ -26,7 +26,7 @@ docker-compose up -d mongodb
 
 ### 2. Run the Application
 ```bash
-cd /home/kojo/work/JojoAddisonDev/kojo-stack-api
+cd /.../kojo-stack-api
 
 # Build (if needed)
 ./mvnw clean package -DskipTests
