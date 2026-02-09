@@ -8,8 +8,8 @@ services:
       MONGO_INITDB_DATABASE: kojo-stack
     volumes:
       - mongodb-data:/data/db
-      - ./data.json:/docker-entrypoint-initdb.d/data.json:ro
-      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+      - ./dist/data.json:/docker-entrypoint-initdb.d/data.json:ro
+      - ./dist/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
     networks:
       - kojo-network
     restart: unless-stopped
