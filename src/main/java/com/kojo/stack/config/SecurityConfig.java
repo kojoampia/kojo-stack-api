@@ -65,7 +65,9 @@ public class SecurityConfig {
 
                 // Configure authorization rules
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        // Authentication endpoints - public (must be before catch-all rules)
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+
                         // Public endpoints - permit all GET requests
                         .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health", "/actuator/**").permitAll()
@@ -75,9 +77,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
-
-                        // Authentication endpoints - public
-                        .requestMatchers("/api/v1/auth/**").permitAll()
 
                         // Any other request requires authentication
                         .anyRequest().authenticated()

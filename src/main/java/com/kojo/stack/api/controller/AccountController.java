@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,20 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService service;
+
+    /**
+     * Get the currently authenticated user's account info.
+     * This endpoint is used by the Angular frontend after login.
+     */
+    @GetMapping("/me")
+    @Timed
+    @Operation(summary = "Get current authenticated user account")
+    public ResponseEntity<AccountDTO> getCurrentUser(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(service.getByLogin(authentication.getName()));
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
