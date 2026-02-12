@@ -2,9 +2,11 @@ package com.kojo.stack.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ public class JwtTokenProvider {
 
     @Value("${app.jwtExpirationMs:86400000}")
     private long jwtExpirationMs;
+    
 
     /**
      * Generate JWT token from authentication
@@ -33,14 +36,13 @@ public class JwtTokenProvider {
         String username = authentication.getName();
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -50,14 +52,12 @@ public class JwtTokenProvider {
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
