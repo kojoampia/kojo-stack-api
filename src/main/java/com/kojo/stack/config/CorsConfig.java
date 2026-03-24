@@ -23,8 +23,11 @@ public class CorsConfig {
 
         // Allow specific origins (development)
         config.addAllowedOrigin("http://localhost:4200");    // Angular dev server
+        config.addAllowedOrigin("http://localhost:4800");    // Angular alt port
         config.addAllowedOrigin("http://localhost:8080");    // Docker frontend
         config.addAllowedOrigin("http://127.0.0.1:4200");
+        config.addAllowedOrigin("http://127.0.0.1:4800");
+        config.addAllowedOrigin("http://localhost:8085");    // Spring Boot backend
 
         // Allow all headers and methods
         config.addAllowedHeader("*");

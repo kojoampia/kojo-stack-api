@@ -87,6 +87,7 @@ public class DataInitConfig {
         Account adminUser = Account.builder()
                 .login("kojo")
                 .email("kojo@jojoaddison.net")
+                .activated(true)
                 .password(passwordEncoder.encode("***REMOVED-CREDENTIAL***")) // :P Try to guess the production password :D
                 .authorities(Set.of(adminAuthority))
                 .build();

@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     container_name: kojo-stack-api
     ports:
-      - "8080:8080"
+      - "8085:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       MONGODB_HOST: mongodb

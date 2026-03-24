@@ -57,43 +57,44 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF for stateless API
-                .csrf(csrf -> csrf.disable())
+        // Disable CSRF for stateless API
+        .csrf(csrf -> csrf.disable())
 
-                // Set session management to stateless
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        // Set session management to stateless
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Configure authorization rules
-                .authorizeHttpRequests(authz -> authz
-                        // Authentication endpoints - public (must be before catch-all rules)
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+        // Configure authorization rules
+        .authorizeHttpRequests(authz -> authz
+                // Authentication endpoints - public (must be before catch-all rules)
+                .requestMatchers(HttpMethod.GET, "/api/v1/account/login/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
 
-                        // Public endpoints - permit all GET requests
-                        .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/health", "/actuator/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                // Public endpoints - permit all GET requests
+                .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/health", "/actuator/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-                        // Protected endpoints - require authentication for POST, PUT, DELETE
-                        .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
+                // Protected endpoints - require authentication for POST, PUT, DELETE
+                .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
 
-                        // Any other request requires authentication
-                        .anyRequest().authenticated()
-                )
+                // Any other request requires authentication
+                .anyRequest().authenticated()
+        )
 
-                // Add JWT filter
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        // Add JWT filter
+        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
-                // Exception handling
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(401, "Unauthorized");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendError(403, "Forbidden");
-                        })
-                );
+        // Exception handling
+        .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendError(401, "Unauthorized");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendError(403, "Forbidden");
+                })
+        );
 
         return http.build();
     }

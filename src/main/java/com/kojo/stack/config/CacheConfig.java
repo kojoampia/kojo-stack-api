@@ -7,10 +7,12 @@ import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.core.io.ClassPathResource;
+
 import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Cache configuration using Ehcache 3 (JCache/JSR-107) as in-memory cache provider.
@@ -24,9 +26,9 @@ import java.net.URISyntaxException;
 public class CacheConfig {
 
     @Bean
-    public CacheManager cacheManager() throws URISyntaxException {
+    public CacheManager cacheManager() throws IOException {
         CachingProvider cachingProvider = Caching.getCachingProvider("org.ehcache.jsr107.EhcacheCachingProvider");
-        URI configUri = getClass().getResource("/ehcache.xml").toURI();
+        URI configUri = new ClassPathResource("ehcache.xml").getURI();
         javax.cache.CacheManager jCacheManager = cachingProvider.getCacheManager(configUri, getClass().getClassLoader());
         log.info("Ehcache in-memory cache manager initialized with config: {}", configUri);
         return new JCacheCacheManager(jCacheManager);

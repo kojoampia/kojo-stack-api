@@ -30,7 +30,7 @@ public class AccountController {
      * Get the currently authenticated user's account info.
      * This endpoint is used by the Angular frontend after login.
      */
-    @GetMapping("/me")
+    @GetMapping("/")
     @Timed
     @Operation(summary = "Get current authenticated user account")
     public ResponseEntity<AccountDTO> getCurrentUser(Authentication authentication) {
@@ -40,7 +40,7 @@ public class AccountController {
         return ResponseEntity.ok(service.getByLogin(authentication.getName()));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     @Timed
     @Operation(summary = "Get all user logins")
