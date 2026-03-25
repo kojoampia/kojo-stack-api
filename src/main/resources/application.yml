@@ -90,3 +90,6 @@ springdoc:
 app:
   jwtSecret: ***REMOVED-JWT-SECRET***
   jwtExpirationMs: 86400000  # 24 hours in milliseconds
+  mail:
+    from: ${APP_MAIL_FROM:no-reply@kojo-stack.local}
+    base-url: ${APP_MAIL_BASE_URL:http://localhost:4200}

@@ -2,7 +2,8 @@ package com.kojo.stack.service;
 
 import com.kojo.stack.api.dto.SettingsDTO;
 import com.kojo.stack.domain.model.Settings;
-import com.kojo.stack.domain.repository.SettingsRepository;
+import com.kojo.stack.repository.SettingsRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

@@ -66,7 +66,7 @@ public class SecurityConfig {
         // Configure authorization rules
         .authorizeHttpRequests(authz -> authz
                 // Authentication endpoints - public (must be before catch-all rules)
-                .requestMatchers(HttpMethod.GET, "/api/v1/account/login/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/account/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
 
                 // Public endpoints - permit all GET requests

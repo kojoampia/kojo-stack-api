@@ -3,7 +3,8 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.ProjectDTO;
 import com.kojo.stack.api.mapper.ProjectMapper;
 import com.kojo.stack.domain.model.Project;
-import com.kojo.stack.domain.repository.ProjectRepository;
+import com.kojo.stack.repository.ProjectRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

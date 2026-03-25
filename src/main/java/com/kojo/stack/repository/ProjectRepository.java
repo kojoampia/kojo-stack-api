@@ -1,4 +1,4 @@
-package com.kojo.stack.domain.repository;
+package com.kojo.stack.repository;
 
 import com.kojo.stack.domain.model.Project;
 import org.springframework.data.mongodb.repository.MongoRepository;

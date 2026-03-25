@@ -1,4 +1,4 @@
-package com.kojo.stack.web.rest.vm;
+package com.kojo.stack.api.vm;
 
 import com.kojo.stack.service.dto.AdminUserDTO;
 import jakarta.validation.constraints.Size;

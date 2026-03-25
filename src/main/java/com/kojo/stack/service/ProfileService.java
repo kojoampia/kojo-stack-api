@@ -2,7 +2,8 @@ package com.kojo.stack.service;
 
 import com.kojo.stack.api.dto.ProfileDTO;
 import com.kojo.stack.domain.model.Profile;
-import com.kojo.stack.domain.repository.ProfileRepository;
+import com.kojo.stack.repository.ProfileRepository;
+
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

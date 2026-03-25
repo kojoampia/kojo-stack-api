@@ -3,7 +3,8 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.TechSkillDTO;
 import com.kojo.stack.api.mapper.ExperienceMapper;
 import com.kojo.stack.domain.model.TechSkill;
-import com.kojo.stack.domain.repository.SkillRepository;
+import com.kojo.stack.repository.SkillRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;

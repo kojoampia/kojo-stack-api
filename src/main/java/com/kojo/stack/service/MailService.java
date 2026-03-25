@@ -1,105 +1,89 @@
 package com.kojo.stack.service;
 
 import com.kojo.stack.domain.User;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import reactor.core.publisher.Mono;
-import tech.jhipster.config.JHipsterProperties;
 
 /**
- * Service for sending emails asynchronously.
+ * Service for sending emails.
  */
 @Service
 public class MailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
 
-    private static final String USER = "user";
+    private final JavaMailSender mailSender;
 
-    private static final String BASE_URL = "baseUrl";
+    private final String mailFrom;
 
-    private final JHipsterProperties jHipsterProperties;
-
-    private final JavaMailSender javaMailSender;
-
-    private final MessageSource messageSource;
-
-    private final SpringTemplateEngine templateEngine;
+    private final String baseUrl;
 
     public MailService(
-        JHipsterProperties jHipsterProperties,
-        JavaMailSender javaMailSender,
-        MessageSource messageSource,
-        SpringTemplateEngine templateEngine
+        ObjectProvider<JavaMailSender> mailSenderProvider,
+        @Value("${app.mail.from:no-reply@kojo-stack.local}") String mailFrom,
+        @Value("${app.mail.base-url:http://localhost:4200}") String baseUrl
     ) {
-        this.jHipsterProperties = jHipsterProperties;
-        this.javaMailSender = javaMailSender;
-        this.messageSource = messageSource;
-        this.templateEngine = templateEngine;
+        this.mailSender = mailSenderProvider.getIfAvailable();
+        this.mailFrom = mailFrom;
+        this.baseUrl = baseUrl;
     }
 
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
-        Mono.defer(() -> {
-            sendEmailSync(to, subject, content, isMultipart, isHtml);
-            return Mono.empty();
-        }).subscribe();
-    }
+        if (to == null || to.isBlank()) {
+            LOG.debug("Skipping email send because recipient is blank");
+            return;
+        }
 
-    private void sendEmailSync(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
-        LOG.debug(
-            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart,
-            isHtml,
-            to,
-            subject,
-            content
-        );
+        if (mailSender == null) {
+            LOG.info("Skipping email send because no JavaMailSender bean is configured. to='{}', subject='{}'", to, subject);
+            return;
+        }
 
-        // Prepare message using a Spring helper
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setFrom(mailFrom);
+        message.setSubject(subject);
+        message.setText(content);
+
         try {
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
-            message.setTo(to);
-            message.setFrom(jHipsterProperties.getMail().getFrom());
-            message.setSubject(subject);
-            message.setText(content, isHtml);
-            javaMailSender.send(mimeMessage);
-            LOG.debug("Sent email to User '{}'", to);
-        } catch (MailException | MessagingException e) {
-            LOG.warn("Email could not be sent to user '{}'", to, e);
+            mailSender.send(message);
+            LOG.info("Sent email to '{}' with subject '{}'", to, subject);
+        } catch (MailException ex) {
+            // Keep auth flows resilient even when SMTP is unavailable.
+            LOG.warn("Failed to send email to '{}' with subject '{}'", to, subject, ex);
         }
     }
 
     public void sendEmailFromTemplate(User user, String templateName, String titleKey) {
-        Mono.defer(() -> {
-            sendEmailFromTemplateSync(user, templateName, titleKey);
-            return Mono.empty();
-        }).subscribe();
-    }
-
-    private void sendEmailFromTemplateSync(User user, String templateName, String titleKey) {
-        if (user.getEmail() == null) {
-            LOG.debug("Email doesn't exist for user '{}'", user.getLogin());
+        if (user == null || user.getEmail() == null) {
+            LOG.debug("Skipping templated email because user or user email is missing");
             return;
         }
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-        String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, null, locale);
-        sendEmailSync(user.getEmail(), subject, content, false, true);
+
+        String subject;
+        String body;
+
+        if ("mail/activationEmail".equals(templateName)) {
+            subject = "Activate your Kojo Stack account";
+            body = buildActivationEmailBody(user);
+        } else if ("mail/passwordResetEmail".equals(templateName)) {
+            subject = "Reset your Kojo Stack password";
+            body = buildResetEmailBody(user);
+        } else if ("mail/creationEmail".equals(templateName)) {
+            subject = "Your Kojo Stack account was created";
+            body = buildCreationEmailBody(user);
+        } else {
+            subject = titleKey;
+            body = "This is an automated notification from Kojo Stack.";
+        }
+
+        sendEmail(user.getEmail(), subject, body, false, false);
     }
 
     public void sendActivationEmail(User user) {
@@ -115,5 +99,37 @@ public class MailService {
     public void sendPasswordResetMail(User user) {
         LOG.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
+    }
+
+    private String buildActivationEmailBody(User user) {
+        String activationKey = user.getActivationKey() == null ? "" : user.getActivationKey();
+        String activationUrl = baseUrl + "/activate?key=" + activationKey;
+        return "Hello " + safeName(user) + ",\n\n"
+            + "Welcome to Kojo Stack. Please activate your account using the link below:\n"
+            + activationUrl + "\n\n"
+            + "If you did not create this account, you can ignore this message.";
+    }
+
+    private String buildResetEmailBody(User user) {
+        String resetKey = user.getResetKey() == null ? "" : user.getResetKey();
+        String resetUrl = baseUrl + "/reset-password?key=" + resetKey;
+        return "Hello " + safeName(user) + ",\n\n"
+            + "A password reset was requested for your Kojo Stack account. Use the link below:\n"
+            + resetUrl + "\n\n"
+            + "If you did not request this reset, you can ignore this message.";
+    }
+
+    private String buildCreationEmailBody(User user) {
+        return "Hello " + safeName(user) + ",\n\n"
+            + "Your Kojo Stack account has been created successfully.\n"
+            + "You can sign in at: " + baseUrl + "\n";
+    }
+
+    private String safeName(User user) {
+        String firstName = user.getFirstName();
+        if (firstName == null || firstName.isBlank()) {
+            return user.getLogin() == null ? "there" : user.getLogin();
+        }
+        return firstName;
     }
 }

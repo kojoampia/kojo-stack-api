@@ -1,13 +1,16 @@
 package com.kojo.stack.service.dto;
 
 import com.kojo.stack.config.Constants;
-import com.kojo.stack.domain.Authority;
+import com.kojo.stack.domain.model.Authority;
 import com.kojo.stack.domain.User;
+
 import jakarta.validation.constraints.*;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 /**
  * A DTO representing a user, with his authorities.

@@ -1,7 +1,8 @@
 package com.kojo.stack.security;
 
 import com.kojo.stack.domain.model.Account;
-import com.kojo.stack.domain.repository.AccountRepository;
+import com.kojo.stack.repository.AccountRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

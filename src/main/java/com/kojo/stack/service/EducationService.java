@@ -2,7 +2,8 @@ package com.kojo.stack.service;
 
 import com.kojo.stack.api.dto.EducationDTO;
 import com.kojo.stack.domain.model.Education;
-import com.kojo.stack.domain.repository.EducationRepository;
+import com.kojo.stack.repository.EducationRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

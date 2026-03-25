@@ -3,7 +3,8 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.DocDTO;
 import com.kojo.stack.api.mapper.DocMapper;
 import com.kojo.stack.domain.model.Doc;
-import com.kojo.stack.domain.repository.DocRepository;
+import com.kojo.stack.repository.DocRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

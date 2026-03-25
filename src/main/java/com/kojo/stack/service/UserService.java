@@ -16,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kojo.stack.config.Constants;
-import com.kojo.stack.domain.Authority;
 import com.kojo.stack.domain.User;
+import com.kojo.stack.domain.model.Authority;
 import com.kojo.stack.repository.AuthorityRepository;
 import com.kojo.stack.repository.UserRepository;
 import com.kojo.stack.security.AuthoritiesConstants;
@@ -123,8 +123,8 @@ public class UserService {
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         
         Set<Authority> authorities = new HashSet<>();
-        Optional<Authority> userAuthority = authorityRepository.findById(AuthoritiesConstants.USER);
-        userAuthority.ifPresent(authorities::add);
+        Optional<com.kojo.stack.domain.model.Authority> userAuthority = authorityRepository.findById(AuthoritiesConstants.USER);
+        userAuthority.ifPresent(a -> authorities.add(toLegacyAuthority(a)));
         newUser.setAuthorities(authorities);
         
         return saveUser(newUser)
@@ -151,7 +151,7 @@ public class UserService {
         Set<String> authorities = 
         userDTO.getAuthorities() != null ? userDTO.getAuthorities() : new HashSet<>();
         for (String authorityName : authorities) {
-            authorityRepository.findById(authorityName).ifPresent(user.getAuthorities()::add);
+            authorityRepository.findById(authorityName).ifPresent(a -> user.getAuthorities().add(toLegacyAuthority(a)));
         }
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generateResetKey());
         user.setPassword(encryptedPassword);
@@ -195,7 +195,7 @@ public class UserService {
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();
                 for (String authorityName : userDTO.getAuthorities()) {
-                    authorityRepository.findById(authorityName).ifPresent(managedAuthorities::add);
+                    authorityRepository.findById(authorityName).ifPresent(a -> managedAuthorities.add(toLegacyAuthority(a)));
                 }
                 return Optional.of(user);
             })
@@ -324,7 +324,13 @@ public class UserService {
      * @return a list of all the authorities.
      */
     public List<String> getAuthorities() {
-        return authorityRepository.findAll()
-        .stream().map(Authority::getName).collect(Collectors.toList());
+        return (List<String>) authorityRepository.findAll()
+        .stream().map(a -> a.getName()).collect(Collectors.toList());
+    }
+
+    private Authority toLegacyAuthority(com.kojo.stack.domain.model.Authority authority) {
+        Authority legacy = new Authority();
+        legacy.setName(authority.getName());
+        return legacy;
     }
 }

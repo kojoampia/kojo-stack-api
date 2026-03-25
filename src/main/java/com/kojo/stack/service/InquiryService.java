@@ -3,7 +3,8 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.InquiryDTO;
 import com.kojo.stack.api.mapper.InquiryMapper;
 import com.kojo.stack.domain.model.Inquiry;
-import com.kojo.stack.domain.repository.InquiryRepository;
+import com.kojo.stack.repository.InquiryRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

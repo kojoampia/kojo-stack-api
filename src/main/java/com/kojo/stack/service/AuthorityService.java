@@ -2,7 +2,8 @@ package com.kojo.stack.service;
 
 import com.kojo.stack.api.dto.AuthorityDTO;
 import com.kojo.stack.domain.model.Authority;
-import com.kojo.stack.domain.repository.AuthorityRepository;
+import com.kojo.stack.repository.AuthorityRepository;
+
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

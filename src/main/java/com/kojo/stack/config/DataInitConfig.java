@@ -1,17 +1,31 @@
 package com.kojo.stack.config;
 
-import com.kojo.stack.domain.model.*;
-import com.kojo.stack.domain.repository.*;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.List;
+import com.kojo.stack.domain.model.Account;
+import com.kojo.stack.domain.model.Authority;
+import com.kojo.stack.domain.model.Doc;
+import com.kojo.stack.domain.model.Education;
+import com.kojo.stack.domain.model.Experience;
+import com.kojo.stack.domain.model.Project;
+import com.kojo.stack.domain.model.TechSkill;
+import com.kojo.stack.repository.AccountRepository;
+import com.kojo.stack.repository.AuthorityRepository;
+import com.kojo.stack.repository.DocRepository;
+import com.kojo.stack.repository.EducationRepository;
+import com.kojo.stack.repository.ExperienceRepository;
+import com.kojo.stack.repository.ProjectRepository;
+import com.kojo.stack.repository.SkillRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Data Initialization Configuration

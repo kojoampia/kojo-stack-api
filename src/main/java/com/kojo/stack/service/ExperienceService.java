@@ -3,7 +3,8 @@ package com.kojo.stack.service;
 import com.kojo.stack.api.dto.ExperienceDTO;
 import com.kojo.stack.api.mapper.ExperienceMapper;
 import com.kojo.stack.domain.model.Experience;
-import com.kojo.stack.domain.repository.ExperienceRepository;
+import com.kojo.stack.repository.ExperienceRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

@@ -1,4 +1,4 @@
-package com.kojo.stack.web.rest.vm;
+package com.kojo.stack.api.vm;
 
 /**
  * View Model object for storing the user's key and password.

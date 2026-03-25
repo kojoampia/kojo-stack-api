@@ -35,6 +35,10 @@ services:
       MONGODB_DATABASE: kojo-stack
       MONGODB_USER: ""
       MONGODB_PASSWORD: ""
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_HOST: ""
+      MAIL_PORT: ""
       JWT_SECRET: DilDo2Disz4k1PJ1sGgP7X68rGYX0moWmuo2ETUUS+iuV0wBnLKrPSV26bGzbEGV0AQX4mkafBAOoQ+pu04cPbcwfLOrkIPHnFMrFjsZhM+Z8dc7kLDnimYJVPSXXmq1u8WJcRsNeOjHBvZ9rv7pyYPxbDI+XXagqgqFrVtA6QnieA7PppoVxnU5ygyI9F8R/T+Uir2kXbkd8dkmi3NBw5JVTa1VGOJzD2Tx+KRgnujCpLeDlp81QM7ETPA3JQ8xXcq+0aVJCksiX9PGM8CYSN72BJvbGZJfK5IzWW7aWuSZxwRN8ajInS5pzSSi3qJYbyHNLs8cFHPl0U5LXw==
     depends_on:
       mongodb:

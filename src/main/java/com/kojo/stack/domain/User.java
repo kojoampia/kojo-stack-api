@@ -2,6 +2,8 @@ package com.kojo.stack.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kojo.stack.config.Constants;
+import com.kojo.stack.domain.model.Authority;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

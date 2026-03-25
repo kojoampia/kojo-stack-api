@@ -9,6 +9,19 @@ spring:
       uri: mongodb://localhost:27017/kojo-stack
       auto-index-creation: true
 
+  # Mail Configuration (Local Development - MailHog/Mailpit)
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
   # Kafka Configuration (Local Development)
   kafka:
     bootstrap-servers: localhost:9092
@@ -43,7 +56,7 @@ logging:
 
 # Development Server Config
 server:
-  port: 8080
+  port: 8085
   error:
     include-stacktrace: always
     include-message: always

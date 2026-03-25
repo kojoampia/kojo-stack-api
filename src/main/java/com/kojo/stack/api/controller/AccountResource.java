@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kojo.stack.repository.UserRepository;
+import com.kojo.stack.domain.User;
 import com.kojo.stack.security.SecurityUtils;
 import com.kojo.stack.service.EmailAlreadyUsedException;
 import com.kojo.stack.service.InvalidPasswordException;
@@ -71,12 +72,7 @@ public class AccountResource {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        userService
-            .registerUser(managedUserVM, managedUserVM.getPassword())
-            .map(user -> {
-                mailService.sendActivationEmail(user);
-                return Mono.just(user);
-            });
+        userService.registerUser(managedUserVM, managedUserVM.getPassword()).ifPresent(mailService::sendActivationEmail);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -90,8 +86,7 @@ public class AccountResource {
     public ResponseEntity<Void> activateAccount(@RequestParam(value = "key") String key) {
         userService
             .activateRegistration(key)
-            .switchIfEmpty(Optional.error(new AccountResourceException("No user was found for this activation key")))
-            .block();
+            .orElseThrow(() -> new AccountResourceException("No user was found for this activation key"));
         return ResponseEntity.ok().build();
     }
 
@@ -106,8 +101,7 @@ public class AccountResource {
         AdminUserDTO userDTO = userService
             .getUserWithAuthorities()
             .map(AdminUserDTO::new)
-            .switchIfEmpty(Optional.error(new AccountResourceException("User could not be found")))
-            .block();
+            .orElseThrow(() -> new AccountResourceException("User could not be found"));
         return ResponseEntity.ok(userDTO);
     }
 
@@ -120,31 +114,22 @@ public class AccountResource {
      */
     @PostMapping("/account")
     public ResponseEntity<Void> saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
-        SecurityUtils.getCurrentUserLogin()
-            .switchIfEmpty(Optional.error(new AccountResourceException("Current user login not found")))
-            .flatMap(userLogin ->
-                userRepository
-                    .findOneByEmailIgnoreCase(userDTO.getEmail())
-                    .filter(existingUser -> !existingUser.getLogin().equalsIgnoreCase(userLogin))
-                    .hasElement()
-                    .flatMap(emailExists -> {
-                        if (emailExists) {
-                            throw new EmailAlreadyUsedException();
-                        }
-                        return userRepository.findOneByLogin(userLogin);
-                    })
-            )
-            .switchIfEmpty(Optional.error(new AccountResourceException("User could not be found")))
-            .flatMap(user ->
-                userService.updateUser(
-                    userDTO.getFirstName(),
-                    userDTO.getLastName(),
-                    userDTO.getEmail(),
-                    userDTO.getLangKey(),
-                    userDTO.getImageUrl()
-                )
-            )
-            .block();
+        String userLogin = SecurityUtils
+            .getCurrentUserLogin()
+            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+
+        userRepository
+            .findOneByEmailIgnoreCase(userDTO.getEmail())
+            .filter(existingUser -> !existingUser.getLogin().equalsIgnoreCase(userLogin))
+            .ifPresent(existingUser -> {
+                throw new EmailAlreadyUsedException();
+            });
+
+        userRepository
+            .findOneByLogin(userLogin)
+            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+
+        userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(), userDTO.getLangKey(), userDTO.getImageUrl());
         return ResponseEntity.ok().build();
     }
 
@@ -159,7 +144,7 @@ public class AccountResource {
         if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword()).block();
+        userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -170,18 +155,14 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/init")
     public ResponseEntity<Void> requestPasswordReset(@RequestBody String mail) {
-        userService
-            .requestPasswordReset(mail)
-            .doOnSuccess(user -> {
-                if (Objects.nonNull(user)) {
-                    mailService.sendPasswordResetMail(user);
-                } else {
-                    // Pretend the request has been successful to prevent checking which emails really exist
-                    // but log that an invalid attempt has been made
-                    LOG.warn("Password reset requested for non existing mail");
-                }
-            })
-            .block();
+        Optional<User> user = userService.requestPasswordReset(mail);
+        if (Objects.nonNull(user) && user.isPresent()) {
+            mailService.sendPasswordResetMail(user.get());
+        } else {
+            // Pretend the request has been successful to prevent checking which emails really exist
+            // but log that an invalid attempt has been made
+            LOG.warn("Password reset requested for non existing mail");
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -199,8 +180,7 @@ public class AccountResource {
         }
         userService
             .completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey())
-            .switchIfEmpty(Optional.error(new AccountResourceException("No user was found for this reset key")))
-            .block();
+            .orElseThrow(() -> new AccountResourceException("No user was found for this reset key"));
         return ResponseEntity.ok().build();
     }
 
