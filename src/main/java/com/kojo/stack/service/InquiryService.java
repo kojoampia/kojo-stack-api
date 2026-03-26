@@ -65,9 +65,38 @@ public class InquiryService {
         Inquiry saved = repository.save(entity);
         
         // Publish event for email notifications, etc.
-        publishInquiryReceivedEvent(saved);
+        // publishInquiryReceivedEvent(saved);
         
         return mapper.toDTO(saved);
+    }
+
+    @Transactional
+    public InquiryDTO update(String id, InquiryDTO dto) {
+        log.info("Updating inquiry with id: {}", id);
+
+        Inquiry entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found: " + id));
+
+        entity.setName(dto.getName());
+        entity.setEmail(dto.getEmail());
+        entity.setMessage(dto.getMessage());
+
+        if (dto.getType() != null) {
+            try {
+                entity.setType(Inquiry.InquiryType.valueOf(dto.getType()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid type: " + dto.getType());
+            }
+        }
+        if (dto.getStatus() != null) {
+            try {
+                entity.setStatus(Inquiry.InquiryStatus.valueOf(dto.getStatus()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid status: " + dto.getStatus());
+            }
+        }
+
+        return mapper.toDTO(repository.save(entity));
     }
 
     @Transactional

@@ -8,6 +8,7 @@ import com.kojo.stack.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,37 @@ public class SkillService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    @CacheEvict(value = {"skills", "skillsByCategory"}, allEntries = true)
+    public TechSkillDTO create(TechSkillDTO dto) {
+        log.info("Creating new skill: {}", dto.getName());
+        TechSkill entity = mapToEntity(dto);
+        TechSkill saved = repository.save(entity);
+        return mapToDTO(saved);
+    }
+
+    @Transactional
+    @CacheEvict(value = {"skills", "skillsByCategory"}, allEntries = true)
+    public TechSkillDTO update(String id, TechSkillDTO dto) {
+        log.info("Updating skill with id: {}", id);
+        TechSkill entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Skill not found: " + id));
+
+        entity.setName(dto.getName());
+        entity.setCategory(dto.getCategory());
+        entity.setLevel(dto.getLevel());
+        entity.setIcon(dto.getIcon());
+
+        return mapToDTO(repository.save(entity));
+    }
+
+    @Transactional
+    @CacheEvict(value = {"skills", "skillsByCategory"}, allEntries = true)
+    public void delete(String id) {
+        log.info("Deleting skill with id: {}", id);
+        repository.deleteById(id);
+    }
+
     private TechSkillDTO mapToDTO(TechSkill entity) {
         return TechSkillDTO.builder()
                 .id(entity.getId())
@@ -57,6 +89,16 @@ public class SkillService {
                 .category(entity.getCategory())
                 .level(entity.getLevel())
                 .icon(entity.getIcon())
+                .build();
+    }
+
+    private TechSkill mapToEntity(TechSkillDTO dto) {
+        return TechSkill.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .category(dto.getCategory())
+                .level(dto.getLevel())
+                .icon(dto.getIcon())
                 .build();
     }
 }

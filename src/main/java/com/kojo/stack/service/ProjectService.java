@@ -71,10 +71,12 @@ public class ProjectService {
     public ProjectDTO create(ProjectDTO dto) {
         log.info("Creating new project: {}", dto.getName());
         Project entity = mapper.toEntity(dto);
+        entity.setStatus(Project.ProjectStatus.valueOf(dto.getStatus()));
+        entity.setType(Project.ProjectType.valueOf(dto.getType()));
         Project saved = repository.save(entity);
         
         // Publish event for event-driven consumers
-        publishProjectCreatedEvent(saved);
+        // publishProjectCreatedEvent(saved);
         
         return mapper.toDTO(saved);
     }
@@ -88,9 +90,13 @@ public class ProjectService {
         
         entity.setName(dto.getName());
         entity.setClient(dto.getClient());
+        entity.setType(Project.ProjectType.valueOf(dto.getType()));
+        entity.setStatus(Project.ProjectStatus.valueOf(dto.getStatus()));
+        entity.setArchitecture(dto.getArchitecture());
         entity.setDescription(dto.getDescription());
         entity.setStack(dto.getStack());
-        entity.setArchitecture(dto.getArchitecture());
+        entity.setStartDate(dto.getStartDate());
+        entity.setEndDate(dto.getEndDate());
         
         return mapper.toDTO(repository.save(entity));
     }

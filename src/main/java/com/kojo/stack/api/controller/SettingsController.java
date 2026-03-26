@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * SettingsController - REST endpoints for application settings management
  */
@@ -19,6 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class SettingsController {
 
     private final SettingsService service;
+
+    @GetMapping
+    @Operation(summary = "Get all settings")
+    public ResponseEntity<List<SettingsDTO>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get settings by ID")

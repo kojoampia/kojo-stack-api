@@ -34,10 +34,10 @@ public class Inquiry implements Serializable {
     private InquiryStatus status = InquiryStatus.NEW;
 
     public enum InquiryType {
-        BACKEND, FRONTEND, DEVOPS, DATA_ENGINEERING, FULL_STACK, CONSULTING, OTHER
+        BACKEND, FRONTEND, DEVOPS, DATA_ENGINEERING, FULL_STACK, CONSULTING, MICROSERVICES, MIGRATION, OTHER
     }
 
     public enum InquiryStatus {
-        NEW, VIEWED, IN_PROGRESS, COMPLETED, REJECTED
+        NEW, CONTACTED, VIEWED, IN_PROGRESS, COMPLETED, REJECTED
     }
 }

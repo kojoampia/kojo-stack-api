@@ -52,4 +52,8 @@
     <cache alias="docs" uses-template="default"/>
     <cache alias="docsByType" uses-template="default"/>
 
+    <!-- Metric caches -->
+    <cache alias="metrics" uses-template="default"/>
+    <cache alias="metricsByCategory" uses-template="default"/>
+
 </config>

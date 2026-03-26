@@ -71,6 +71,7 @@ public class ExperienceService {
         entity.setRole(dto.getRole());
         entity.setPeriod(dto.getPeriod());
         entity.setDescription(dto.getDescription());
+        entity.setStatus(Experience.StatusType.valueOf(dto.getStatus()));
         entity.setStack(dto.getStack());
         
         return mapper.toDTO(repository.save(entity));

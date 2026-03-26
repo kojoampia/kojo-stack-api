@@ -5,6 +5,7 @@ import com.kojo.stack.service.SkillService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,5 +38,24 @@ public class SkillController {
     @Operation(summary = "Get expert-level skills", description = "Get all skills with proficiency >= 80")
     public ResponseEntity<List<TechSkillDTO>> getExpertSkills() {
         return ResponseEntity.ok(service.getExpertSkills());
+    }
+
+    @PostMapping
+    @Operation(summary = "Create new skill")
+    public ResponseEntity<TechSkillDTO> create(@RequestBody TechSkillDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update skill")
+    public ResponseEntity<TechSkillDTO> update(@PathVariable String id, @RequestBody TechSkillDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete skill")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

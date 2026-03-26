@@ -11,6 +11,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * SettingsService - Business logic for application settings management
  * Handles CRUD operations for user settings
@@ -22,6 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class SettingsService {
 
     private final SettingsRepository repository;
+
+    @Cacheable(value = "settings")
+    public List<SettingsDTO> getAll() {
+        log.info("Fetching all settings");
+        return repository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
     @Cacheable(value = "settings", key = "#id")
     public SettingsDTO getById(String id) {
@@ -50,6 +61,7 @@ public class SettingsService {
         entity.setVerboseLogging(dto.getVerboseLogging());
         entity.setBetaFeatures(dto.getBetaFeatures());
         entity.setTheme(dto.getTheme());
+        entity.setLanguage(dto.getLanguage());
         
         return toDTO(repository.save(entity));
     }
@@ -68,6 +80,7 @@ public class SettingsService {
                 .verboseLogging(entity.getVerboseLogging())
                 .betaFeatures(entity.getBetaFeatures())
                 .theme(entity.getTheme())
+                .language(entity.getLanguage())
                 .build();
     }
 
@@ -77,6 +90,7 @@ public class SettingsService {
                 .verboseLogging(dto.getVerboseLogging())
                 .betaFeatures(dto.getBetaFeatures())
                 .theme(dto.getTheme())
+                .language(dto.getLanguage())
                 .build();
     }
 }

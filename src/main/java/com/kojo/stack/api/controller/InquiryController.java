@@ -48,6 +48,12 @@ public class InquiryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.submitInquiry(dto));
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Update inquiry")
+    public ResponseEntity<InquiryDTO> update(@PathVariable String id, @Valid @RequestBody InquiryDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update inquiry status")
     public ResponseEntity<InquiryDTO> updateStatus(
