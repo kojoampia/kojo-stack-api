@@ -296,5 +296,42 @@
       "category":"Backend",
       "description":"Application Migration to OpenShift PaaS. Designed custom metrics for SLI/SLO monitoring using PromQL."
     }
+  ],
+  "kpis": [
+    {
+      "label": "Total Experience",
+      "value": "16+",
+      "unit": "Years",
+      "icon": "fa-clock",
+      "color": "cyan",
+      "progress": 95,
+      "sortOrder": 1
+    },
+    {
+      "label": "Projects Delivered",
+      "value": "6",
+      "unit": "Systems",
+      "icon": "fa-diagram-project",
+      "color": "purple",
+      "progress": 85,
+      "sortOrder": 2
+    },
+    {
+      "label": "Stack Coverage",
+      "value": "Full",
+      "unit": "Stack",
+      "icon": "fa-layer-group",
+      "color": "green",
+      "subtitle": "Java • Angular • K8s",
+      "sortOrder": 3
+    },
+    {
+      "label": "Current Status",
+      "value": "BUSY",
+      "icon": "fa-signal",
+      "color": "orange",
+      "subtitle": "@ BRZ (Federal Computing)",
+      "sortOrder": 4
+    }
   ]
 }

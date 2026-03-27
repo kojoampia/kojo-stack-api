@@ -22,6 +22,7 @@ import com.kojo.stack.domain.model.Doc;
 import com.kojo.stack.domain.model.Education;
 import com.kojo.stack.domain.model.Experience;
 import com.kojo.stack.domain.model.Inquiry;
+import com.kojo.stack.domain.model.Kpi;
 import com.kojo.stack.domain.model.Metric;
 import com.kojo.stack.domain.model.Project;
 import com.kojo.stack.domain.model.Settings;
@@ -32,6 +33,7 @@ import com.kojo.stack.repository.DocRepository;
 import com.kojo.stack.repository.EducationRepository;
 import com.kojo.stack.repository.ExperienceRepository;
 import com.kojo.stack.repository.InquiryRepository;
+import com.kojo.stack.repository.KpiRepository;
 import com.kojo.stack.repository.MetricRepository;
 import com.kojo.stack.repository.ProfileRepository;
 import com.kojo.stack.repository.ProjectRepository;
@@ -62,6 +64,7 @@ public class DataInitConfig {
     private final InquiryRepository inquiryRepository;
     private final SettingsRepository settingsRepository;
     private final MetricRepository metricRepository;
+    private final KpiRepository kpiRepository;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
@@ -85,6 +88,7 @@ public class DataInitConfig {
             initializeInquiries(root.path("inquiries"));
             initializeSettings(root.path("settings"));
             initializeMetrics(root.path("metrics"));
+            initializeKpis(root.path("kpis"));
         };
     }
 
@@ -289,6 +293,24 @@ public class DataInitConfig {
                     .build());
         }
         metricRepository.saveAll(metrics);
+    }
+
+    private void initializeKpis(JsonNode kpisNode) {
+        kpiRepository.deleteAll();
+        List<Kpi> kpis = new ArrayList<>();
+        for (JsonNode node : kpisNode) {
+            kpis.add(Kpi.builder()
+                    .label(node.path("label").asText())
+                    .value(node.path("value").asText())
+                    .unit(node.path("unit").asText(null))
+                    .icon(node.path("icon").asText(null))
+                    .color(node.path("color").asText(null))
+                    .progress(node.has("progress") ? node.path("progress").asInt() : null)
+                    .subtitle(node.path("subtitle").asText(null))
+                    .sortOrder(node.has("sortOrder") ? node.path("sortOrder").asInt() : null)
+                    .build());
+        }
+        kpiRepository.saveAll(kpis);
     }
 
     private List<String> toStringList(JsonNode arrayNode) {

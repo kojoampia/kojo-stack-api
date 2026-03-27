@@ -56,4 +56,7 @@
     <cache alias="metrics" uses-template="default"/>
     <cache alias="metricsByCategory" uses-template="default"/>
 
+    <!-- KPI caches -->
+    <cache alias="kpis" uses-template="default"/>
+
 </config>
