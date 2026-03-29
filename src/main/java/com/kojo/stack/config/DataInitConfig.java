@@ -80,7 +80,7 @@ public class DataInitConfig {
             initializeAuthorities(root.path("authorities"));
             initializeAccounts(root.path("accounts"));
             initializeExperiences(root.path("experiences"));
-            initializeSkills(root.path("skills"));
+            initializeSkills(root.path("tech_skills"));
             initializeProjects(root.path("projects"));
             initializeDocumentation(root.path("documentation"));
             initializeEducation(root.path("education"));

@@ -1,9 +1,13 @@
 package com.kojo.stack.repository;
 
 import com.kojo.stack.domain.model.Account;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,6 +33,16 @@ public interface AccountRepository extends MongoRepository<Account, String> {
     Optional<Account> findByFirstName(String firstName);
 
     Optional<Account> findByLastName(String lastName);
+
+
+    Optional<Account> findOneByActivationKey(String activationKey);
+    Optional<Account> findOneByResetKey(String resetKey);
+    Optional<Account> findOneByEmailIgnoreCase(String email);
+    Optional<Account> findOneByLogin(String login);
+
+    List<Account> findAllByIdNotNull(Pageable pageable);
+    List<Account> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
+    List<Account> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime);  
 
     
 }

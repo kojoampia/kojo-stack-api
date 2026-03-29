@@ -10,6 +10,7 @@ import com.kojo.stack.domain.model.Account;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.kojo.stack.security.SecurityUtils;
 
 /**
  * AccountService - Business logic for user login management
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AccountService {
 
-    private final AccountRepository AccountRepository;
+    private final AccountRepository accountRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -38,7 +42,7 @@ public class AccountService {
     @Cacheable(value = "Accounts")
     public List<AccountDTO> getAll() {
         log.info("Fetching all user logins");
-        return AccountRepository.findAll().stream()
+        return accountRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -47,7 +51,7 @@ public class AccountService {
     @Cacheable(value = "Account", key = "#id")
     public AccountDTO getById(String id) {
         log.info("Fetching user login with id: {}", id);
-        return AccountRepository.findById(id)
+        return accountRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("User login not found: " + id));
     }
@@ -55,7 +59,7 @@ public class AccountService {
     @Timed
     public AccountDTO getByLogin(String login) {
         log.info("Fetching user login by login: {}", login);
-        return AccountRepository.findByLogin(login)
+        return accountRepository.findByLogin(login)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("User login not found for login: " + login));
     }
@@ -63,7 +67,7 @@ public class AccountService {
     @Timed
     public AccountDTO getByEmail(String email) {
         log.info("Fetching user login by email: {}", email);
-        return AccountRepository.findByEmail(email)
+        return accountRepository.findByEmail(email)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("User login not found for email: " + email));
     }
@@ -75,12 +79,12 @@ public class AccountService {
         log.info("Creating new user login for login: {}", dto.getLogin());
         
         // Check if login already exists
-        if (AccountRepository.findByLogin(dto.getLogin()).isPresent()) {
+        if (accountRepository.findByLogin(dto.getLogin()).isPresent()) {
             throw new RuntimeException("Login already exists: " + dto.getLogin());
         }
         
         // Check if email already exists
-        if (AccountRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (accountRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists: " + dto.getEmail());
         }
         
@@ -103,7 +107,7 @@ public class AccountService {
             entity.setAuthorities(authorities);
         }
         
-        Account saved = AccountRepository.save(entity);
+        Account saved = accountRepository.save(entity);
         return toDTO(saved);
     }
 
@@ -113,7 +117,7 @@ public class AccountService {
     public AccountDTO update(String id, AccountDTO dto) {
         log.info("Updating user login with id: {}", id);
         
-        Account entity = AccountRepository.findById(id)
+        Account entity = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User login not found: " + id));
         
         entity.setLogin(dto.getLogin());
@@ -138,7 +142,7 @@ public class AccountService {
             entity.setAuthorities(authorities);
         }
         
-        return toDTO(AccountRepository.save(entity));
+        return toDTO(accountRepository.save(entity));
     }
 
     @Timed
@@ -146,7 +150,7 @@ public class AccountService {
     @CacheEvict(value = {"Accounts", "Account"}, allEntries = true)
     public void delete(String id) {
         log.info("Deleting user login with id: {}", id);
-        AccountRepository.deleteById(id);
+        accountRepository.deleteById(id);
     }
 
     // Mapper methods
@@ -187,5 +191,51 @@ public class AccountService {
                 .langKey(dto.getLangKey())
                 .imageUrl(dto.getImageUrl())
                 .build();
+    }
+
+
+    public Optional<Account> completePasswordReset(String newPassword, String key) {
+        log.debug("Reset user password for reset key {}", key);
+        return accountRepository
+            .findOneByResetKey(key)
+            .map(user -> {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setResetKey(null);
+                return user;
+            })
+            .flatMap(this::saveAccount);
+    }
+
+    public Optional<Account> requestPasswordReset(String mail) {
+        return accountRepository
+            .findOneByEmailIgnoreCase(mail)
+            .filter(Account::isActivated)
+            .map(user -> {
+                user.setResetKey(RandomUtil.generateResetKey());
+                return user;
+            })
+            .flatMap(this::saveAccount);
+    }
+
+    public Optional<Void> changePassword(String currentClearTextPassword, String newPassword) {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(accountRepository::findOneByLogin)
+            .map(account -> {
+                String currentEncryptedPassword = account.getPassword();
+                if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
+                    throw new InvalidPasswordException();
+                }
+                account.setPassword(passwordEncoder.encode(newPassword));
+                return account;
+            })
+            .flatMap(this::saveAccount)
+            .map(savedAccount -> {
+                log.debug("Changed password for Account: {}", savedAccount.getLogin());
+                return null;
+            });
+    }
+
+    private Optional<Account> saveAccount(Account account) {
+        return Optional.of(accountRepository.save(account));
     }
 }

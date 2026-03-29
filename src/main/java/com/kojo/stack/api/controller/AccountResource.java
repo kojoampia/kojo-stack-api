@@ -47,9 +47,7 @@ public class AccountResource {
     private static final Logger LOG = LoggerFactory.getLogger(AccountResource.class);
 
     private final UserRepository userRepository;
-
     private final UserService userService;
-
     private final MailService mailService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {

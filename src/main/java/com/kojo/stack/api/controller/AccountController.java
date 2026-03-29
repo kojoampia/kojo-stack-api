@@ -1,11 +1,16 @@
 package com.kojo.stack.api.controller;
 
 import com.kojo.stack.api.dto.AccountDTO;
+import com.kojo.stack.api.vm.ManagedUserVM;
 import com.kojo.stack.service.AccountService;
+import com.kojo.stack.service.InvalidPasswordException;
+import com.kojo.stack.service.UserService;
+import com.kojo.stack.service.dto.PasswordChangeDTO;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -95,5 +100,30 @@ public class AccountController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * {@code POST  /change-password} : changes the current user's password.
+     *
+     * @param passwordChangeDto current and new password.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the new password is incorrect.
+     */
+    @PostMapping("/change-password")
+    @Timed
+    @Operation(summary = "Change current user's password")
+    public ResponseEntity<Void> changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
+        if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
+            throw new InvalidPasswordException();
+        }
+        service.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    private static boolean isPasswordLengthInvalid(String password) {
+        return (
+            StringUtils.isEmpty(password) ||
+            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+        );
     }
 }
