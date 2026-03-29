@@ -36,7 +36,7 @@
       "company": "Bundesrechenzentrum (BRZ)",
       "role": "Software Developer & DevOps Engineer",
       "period": "07/2024 - 03/2026",
-      "status": "Completed",
+      "status": "COMPLETED",
       "description": "Refactoring core APIs and designing GitOps infrastructure. Implementing OpenTelemetry for full system observability.",
       "stack": ["Java 21", "Spring Boot", "OpenTelemetry", "Kubernetes", "DB2", "Grafana"],
       "metrics": [
@@ -49,7 +49,7 @@
       "company": "Abofonsa Mobile Health",
       "role": "Lead Architect (Pro-bono)",
       "period": "03/2022 - Present",
-      "status": "Active",
+      "status": "ACTIVE",
       "description": "Led development of a Near-Real Time communication brokerage platform for mobile health services.",
       "stack": ["JHipster", "Kafka", "MongoDB", "Angular 17", "Docker"],
       "metrics": [
@@ -61,7 +61,7 @@
       "company": "Accenture",
       "role": "Senior DevOps Engineer",
       "period": "06/2022 - 08/2023",
-      "status": "Stable",
+      "status": "STABLE",
       "description": "Application Migration to OpenShift PaaS. Designed custom metrics for SLI/SLO monitoring using PromQL.",
       "stack": ["OpenShift", "Helm", "Jenkins", "Prometheus", "ELK Stack"],
       "metrics": [
@@ -73,7 +73,7 @@
       "company": "Bedrock Insurance",
       "role": "Senior Software Architect",
       "period": "08/2020 - 12/2022",
-      "status": "Stable",
+      "status": "STABLE",
       "description": "Developed Owasp T10 compliant web application with dashboards for Operations and Business Admin.",
       "stack": ["Java 11", "Microservices", "Spring Security", "Angular 10"],
       "metrics": [
@@ -84,7 +84,7 @@
       "company": "Austrian Railways (ÖBB)",
       "role": "Monitoring & DevOps Engineer",
       "period": "02/2019 - 10/2021",
-      "status": "Deprecated",
+      "status": "DEPRECATED",
       "description": "Ticketshop Operations Monitoring. Built dashboards using Elastic Stack and customized alert configurations.",
       "stack": ["Elasticsearch", "Grafana", "OracleDB", "Angular"],
       "metrics": [
@@ -97,27 +97,27 @@
       "id": "inq-1",
       "name": "John Smith",
       "email": "john.smith@techcorp.com",
-      "type": "Microservices",
+      "type": "MICROSERVICES",
       "message": "Looking for help with microservices architecture design for our e-commerce platform.",
-      "status": "New",
+      "status": "NEW",
       "createdAt": "2025-12-01"
     },
     {
       "id": "inq-2",
       "name": "Sarah Johnson",
       "email": "sarah.j@startup.io",
-      "type": "DevOps",
+      "type": "DEVOPS",
       "message": "Need consulting on CI/CD pipeline setup and Kubernetes deployment.",
-      "status": "Contacted",
+      "status": "CONTACTED",
       "createdAt": "2025-11-15"
     },
     {
       "id": "inq-3",
       "name": "Michael Chen",
       "email": "m.chen@enterprise.com",
-      "type": "Migration",
+      "type": "MIGRATION",
       "message": "Planning to migrate legacy Java application to cloud-native architecture.",
-      "status": "In Progress",
+      "status": "IN_PROGRESS",
       "createdAt": "2025-10-20"
     }
   ],
@@ -125,30 +125,30 @@
     {
       "name": "Health Brokerage Platform",
       "client": "Abofonsa Mobile Health",
-      "type": "Microservices",
+      "type": "MICROSERVICES",
       "description": "Near-real time communication brokerage using Kafka streams for mobile health data processing.",
       "stack": ["Java 17", "Kafka", "MongoDB", "JHipster", "Angular 17"],
-      "status": "Live",
+      "status": "LIVE",
       "architecture": "Event-Driven",
       "startDate": "2022-03-01"
     },
     {
       "name": "Enterprise GitOps Pipeline",
       "client": "BRZ",
-      "type": "DevOps",
+      "type": "DEVOPS",
       "description": "Infrastructure as Code design and OpenTelemetry integration for federal computing services.",
       "stack": ["Kubernetes", "ArgoCD", "OpenTelemetry", "Java 21"],
-      "status": "Live",
+      "status": "LIVE",
       "architecture": "Cloud Native",
       "startDate": "2024-07-01"
     },
     {
       "name": "Insurance Portal (OWASP)",
       "client": "Bedrock Insurance",
-      "type": "Microservices",
+      "type": "MICROSERVICES",
       "description": "Secure policy management dashboards and public facing website compliant with OWASP Top 10 standards.",
       "stack": ["Spring Security", "Angular 10", "JWT", "Netflix OSS"],
-      "status": "Maintenance",
+      "status": "MAINTENANCE",
       "architecture": "Microservices",
       "startDate": "2020-08-01",
       "endDate": "2022-12-31"
@@ -156,10 +156,10 @@
     {
       "name": "OpenShift Cloud Migration",
       "client": "Accenture",
-      "type": "Migration",
+      "type": "MIGRATION",
       "description": "Large-scale migration of legacy applications to OpenShift PaaS with custom SLI/SLO monitoring.",
       "stack": ["OpenShift", "Helm", "PromQL", "Groovy"],
-      "status": "Completed",
+      "status": "COMPLETED",
       "architecture": "Hybrid Cloud",
       "startDate": "2022-06-01",
       "endDate": "2023-08-31"
@@ -167,10 +167,10 @@
     {
       "name": "Ticketshop Monitoring",
       "client": "ÖBB",
-      "type": "Monitoring",
+      "type": "MONITORING",
       "description": "High-availability monitoring solution for national rail ticketing operations using Elastic Stack.",
       "stack": ["Elasticsearch", "Grafana", "OracleDB"],
-      "status": "Completed",
+      "status": "COMPLETED",
       "architecture": "Observability",
       "startDate": "2019-02-01",
       "endDate": "2021-10-31"
@@ -181,7 +181,7 @@
       "type": "ETL",
       "description": "Optimization of routine operations for the Interconnection Billing Process implementation on Mediation Zone.",
       "stack": ["Java 6", "Oracle DB", "PL/SQL", "Cognos"],
-      "status": "Completed",
+      "status": "COMPLETED",
       "architecture": "Legacy",
       "startDate": "2010-01-01",
       "endDate": "2015-12-31"
@@ -222,7 +222,7 @@
     }
 
   ],
-  "skills": [
+  "tech_skills": [
     { "name": "Java 8/11/17/21", "category": "Backend", "level": 100, "icon": "java" },
     { "name": "Spring Boot & Cloud", "category": "Backend", "level": 95, "icon": "leaf" },
     { "name": "Microservices", "category": "Backend", "level": 90, "icon": "network-wired" },
