@@ -30,6 +30,15 @@ services:
       - "8085:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      OTEL_SERVICE_NAME: kojo-stack-api
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=prod,service.version=2026.1.0
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_LOG_LEVEL: info
+      OTEL_INSTRUMENTATION_LOGBACK_APPENDER_ENABLED: "true"
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017
       MONGODB_DATABASE: kojo-stack
@@ -41,6 +50,8 @@ services:
       MAIL_PORT: ""
       JWT_SECRET: DilDo2Disz4k1PJ1sGgP7X68rGYX0moWmuo2ETUUS+iuV0wBnLKrPSV26bGzbEGV0AQX4mkafBAOoQ+pu04cPbcwfLOrkIPHnFMrFjsZhM+Z8dc7kLDnimYJVPSXXmq1u8WJcRsNeOjHBvZ9rv7pyYPxbDI+XXagqgqFrVtA6QnieA7PppoVxnU5ygyI9F8R/T+Uir2kXbkd8dkmi3NBw5JVTa1VGOJzD2Tx+KRgnujCpLeDlp81QM7ETPA3JQ8xXcq+0aVJCksiX9PGM8CYSN72BJvbGZJfK5IzWW7aWuSZxwRN8ajInS5pzSSi3qJYbyHNLs8cFHPl0U5LXw==
     depends_on:
+      otel-collector:
+        condition: service_started
       mongodb:
         condition: service_healthy
     networks:
