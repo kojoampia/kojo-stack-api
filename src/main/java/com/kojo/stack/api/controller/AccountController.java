@@ -1,10 +1,8 @@
 package com.kojo.stack.api.controller;
 
 import com.kojo.stack.api.dto.AccountDTO;
-import com.kojo.stack.api.vm.ManagedUserVM;
 import com.kojo.stack.service.AccountService;
 import com.kojo.stack.service.InvalidPasswordException;
-import com.kojo.stack.service.UserService;
 import com.kojo.stack.service.dto.PasswordChangeDTO;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "User Accounts", description = "User account credentials and authorities management endpoints")
 public class AccountController {
+
+    private static final int PASSWORD_MIN_LENGTH = 4;
+    private static final int PASSWORD_MAX_LENGTH = 100;
 
     private final AccountService service;
 
@@ -122,8 +123,8 @@ public class AccountController {
     private static boolean isPasswordLengthInvalid(String password) {
         return (
             StringUtils.isEmpty(password) ||
-            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+            password.length() < PASSWORD_MIN_LENGTH ||
+            password.length() > PASSWORD_MAX_LENGTH
         );
     }
 }

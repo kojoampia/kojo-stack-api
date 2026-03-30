@@ -192,31 +192,6 @@ public class AccountService {
                 .imageUrl(dto.getImageUrl())
                 .build();
     }
-
-
-    public Optional<Account> completePasswordReset(String newPassword, String key) {
-        log.debug("Reset user password for reset key {}", key);
-        return accountRepository
-            .findOneByResetKey(key)
-            .map(user -> {
-                user.setPassword(passwordEncoder.encode(newPassword));
-                user.setResetKey(null);
-                return user;
-            })
-            .flatMap(this::saveAccount);
-    }
-
-    public Optional<Account> requestPasswordReset(String mail) {
-        return accountRepository
-            .findOneByEmailIgnoreCase(mail)
-            .filter(Account::isActivated)
-            .map(user -> {
-                user.setResetKey(RandomUtil.generateResetKey());
-                return user;
-            })
-            .flatMap(this::saveAccount);
-    }
-
     public Optional<Void> changePassword(String currentClearTextPassword, String newPassword) {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(accountRepository::findOneByLogin)
