@@ -11,6 +11,7 @@ RUN mvn dependency:go-offline -B || true
 # Copy source code
 COPY src ./src
 
+
 # Build application
 RUN mvn clean package -DskipTests
 
@@ -21,7 +22,7 @@ WORKDIR /app
 
 # Copy built JAR from builder
 COPY --from=builder /app/target/kojo-stack-api-*.jar kojo-stack-api.jar
-COPY opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
+COPY otel/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
 
 ENV JAVA_TOOL_OPTIONS="-javaagent:/otel/opentelemetry-javaagent.jar"
 
