@@ -1,28 +1,33 @@
 package com.kojo.stack.service;
 
-import com.kojo.stack.api.dto.AuthorityDTO;
-import com.kojo.stack.api.dto.AccountDTO;
-import com.kojo.stack.domain.model.Authority;
-import com.kojo.stack.repository.AccountRepository;
-import com.kojo.stack.repository.AuthorityRepository;
-import com.kojo.stack.domain.model.Account;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-import io.micrometer.core.annotation.Timed;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.kojo.stack.api.dto.AccountDTO;
+import com.kojo.stack.api.dto.AuthorityDTO;
+import com.kojo.stack.domain.model.Account;
+import com.kojo.stack.domain.model.Authority;
+import com.kojo.stack.repository.AccountRepository;
+import com.kojo.stack.repository.AuthorityRepository;
 import com.kojo.stack.security.SecurityUtils;
+
+import io.micrometer.core.annotation.Timed;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * AccountService - Business logic for user login management
@@ -34,9 +39,18 @@ import com.kojo.stack.security.SecurityUtils;
 @Transactional(readOnly = true)
 public class AccountService {
 
+    private static final long PASSWORD_RESET_TOKEN_VALIDITY_DAYS = 1;
+
     private final AccountRepository accountRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
+
+    @Value("${app.mail.from}")
+    private String mailFrom;
+
+    @Value("${app.mail.base-url}")
+    private String mailBaseUrl;
 
     @Timed
     @Cacheable(value = "Accounts")
@@ -210,7 +224,64 @@ public class AccountService {
             });
     }
 
+    @Timed
+    @Transactional
+    public void requestPasswordReset(String email) {
+        if (email == null || email.isBlank()) {
+            return;
+        }
+
+        accountRepository.findOneByEmailIgnoreCase(email.trim())
+            .filter(Account::isActivated)
+            .ifPresent(account -> {
+                account.setResetKey(generateResetKey());
+                account.setResetDate(Instant.now());
+                Account saved = accountRepository.save(account);
+                sendPasswordResetEmail(saved);
+                log.debug("Password reset requested for account: {}", saved.getLogin());
+            });
+    }
+
+    @Timed
+    @Transactional
+    public Optional<Account> completePasswordReset(String newPassword, String key) {
+        Instant expirationThreshold = Instant.now().minus(PASSWORD_RESET_TOKEN_VALIDITY_DAYS, ChronoUnit.DAYS);
+        return accountRepository
+            .findOneByResetKey(key)
+            .filter(account -> account.getResetDate() != null && account.getResetDate().isAfter(expirationThreshold))
+            .map(account -> {
+                account.setPassword(passwordEncoder.encode(newPassword));
+                account.setResetKey(null);
+                account.setResetDate(null);
+                return accountRepository.save(account);
+            });
+    }
+
     private Optional<Account> saveAccount(Account account) {
         return Optional.of(accountRepository.save(account));
+    }
+
+    private String generateResetKey() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    private void sendPasswordResetEmail(Account account) {
+        if (account.getEmail() == null || account.getResetKey() == null) {
+            return;
+        }
+
+        String resetUrl = mailBaseUrl + "/account/reset/finish?key=" + account.getResetKey();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailFrom);
+        message.setTo(account.getEmail());
+        message.setSubject("Kojo Stack password reset");
+        message.setText(
+            "Hello " + (account.getFirstName() != null ? account.getFirstName() : account.getLogin()) + ",\n\n" +
+            "A password reset was requested for your account. " +
+            "Use the following link to set a new password:\n" + resetUrl + "\n\n" +
+            "If you did not request this, you can ignore this email."
+        );
+        mailSender.send(message);
     }
 }

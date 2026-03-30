@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -42,6 +43,8 @@ public class Account implements Serializable {
     private String activationKey;
 
     private String resetKey;
+
+    private Instant resetDate;
 
 
 

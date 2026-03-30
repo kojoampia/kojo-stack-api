@@ -1,9 +1,5 @@
 package com.kojo.stack.config;
 
-import com.kojo.stack.security.CustomUserDetailsService;
-import com.kojo.stack.security.JwtAuthenticationFilter;
-import com.kojo.stack.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.kojo.stack.security.CustomUserDetailsService;
+import com.kojo.stack.security.JwtAuthenticationFilter;
+import com.kojo.stack.security.JwtTokenProvider;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * SecurityConfig - Spring Security configuration for stateless JWT authentication
@@ -68,6 +70,8 @@ public class SecurityConfig {
                 // Authentication endpoints - public (must be before catch-all rules)
                 .requestMatchers(HttpMethod.GET, "/api/v1/account/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/account/reset-password/init").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/account/reset-password/finish").permitAll()
 
                 // Public endpoints - permit all GET requests
                 .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()

@@ -1,21 +1,34 @@
 package com.kojo.stack.api.controller;
 
-import com.kojo.stack.api.dto.AccountDTO;
-import com.kojo.stack.service.AccountService;
-import com.kojo.stack.service.InvalidPasswordException;
-import com.kojo.stack.service.dto.PasswordChangeDTO;
-import io.micrometer.core.annotation.Timed;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import com.kojo.stack.api.dto.AccountDTO;
+import com.kojo.stack.service.AccountService;
+import com.kojo.stack.service.InvalidPasswordException;
+import com.kojo.stack.service.dto.PasswordChangeDTO;
+import com.kojo.stack.service.dto.PasswordResetFinishDTO;
+import com.kojo.stack.service.dto.PasswordResetInitDTO;
+
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
  * AccountController - REST endpoints for user login management
@@ -117,6 +130,31 @@ public class AccountController {
             throw new InvalidPasswordException();
         }
         service.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password/init")
+    @Timed
+    @Operation(summary = "Start password reset flow by email")
+    public ResponseEntity<Void> requestPasswordReset(@Valid @RequestBody PasswordResetInitDTO resetInitDto) {
+        service.requestPasswordReset(resetInitDto.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password/finish")
+    @Timed
+    @Operation(summary = "Complete password reset with reset key and new password")
+    public ResponseEntity<Void> finishPasswordReset(@RequestBody PasswordResetFinishDTO resetFinishDto) {
+        if (resetFinishDto.getKey() == null || resetFinishDto.getKey().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reset key is required");
+        }
+
+        if (isPasswordLengthInvalid(resetFinishDto.getNewPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        service.completePasswordReset(resetFinishDto.getNewPassword(), resetFinishDto.getKey())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No account found for this reset key"));
         return ResponseEntity.ok().build();
     }
 
