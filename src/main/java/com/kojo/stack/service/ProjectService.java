@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,6 @@ public class ProjectService {
 
     private final ProjectRepository repository;
     private final ProjectMapper mapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Cacheable(value = "projects")
     public List<ProjectDTO> getAll() {
@@ -74,10 +72,6 @@ public class ProjectService {
         entity.setStatus(Project.ProjectStatus.valueOf(dto.getStatus()));
         entity.setType(Project.ProjectType.valueOf(dto.getType()));
         Project saved = repository.save(entity);
-        
-        // Publish event for event-driven consumers
-        // publishProjectCreatedEvent(saved);
-        
         return mapper.toDTO(saved);
     }
 
@@ -106,14 +100,5 @@ public class ProjectService {
     public void delete(String id) {
         log.info("Deleting project with id: {}", id);
         repository.deleteById(id);
-    }
-
-    private void publishProjectCreatedEvent(Project project) {
-        try {
-            kafkaTemplate.send("project-events", "project.created", project);
-            log.info("Published project.created event for project: {}", project.getId());
-        } catch (Exception e) {
-            log.warn("Failed to publish event for project: {}", project.getId(), e);
-        }
     }
 }

@@ -22,21 +22,6 @@ spring:
           starttls:
             enable: false
 
-  # Kafka Configuration (Local Development)
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      acks: all
-      retries: 3
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      bootstrap-servers: localhost:9092
-      group-id: kojo-stack-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
 
 # Development Logging (Verbose)
 logging:
@@ -45,7 +30,6 @@ logging:
     com.kojo.stack: DEBUG
     org.springframework.web: DEBUG
     org.springframework.data.mongodb: DEBUG
-    org.springframework.kafka: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -72,3 +56,12 @@ management:
 app:
   db:
     init-data: true
+  # Throwaway local-only signing key so `spring-boot:run -Dspring-boot.run.profiles=dev`
+  # works without extra setup. Never reused by prod, which has no default.
+  jwtSecret: ${JWT_SECRET:dev-only-insecure-signing-key-do-not-deploy-0123456789}
+  admin:
+    # Local-only administrator credential. Prod has no default and refuses to start
+    # without ADMIN_PASSWORD.
+    login: ${ADMIN_LOGIN:admin}
+    email: ${ADMIN_EMAIL:admin@kojo-stack.local}
+    password: ${ADMIN_PASSWORD:dev-only-admin-password}

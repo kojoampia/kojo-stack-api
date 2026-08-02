@@ -7,7 +7,6 @@ import com.kojo.stack.repository.InquiryRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,6 @@ public class InquiryService {
 
     private final InquiryRepository repository;
     private final InquiryMapper mapper;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public List<InquiryDTO> getAll() {
         log.info("Fetching all inquiries");
@@ -63,10 +61,6 @@ public class InquiryService {
         entity.setStatus(Inquiry.InquiryStatus.NEW);
         
         Inquiry saved = repository.save(entity);
-        
-        // Publish event for email notifications, etc.
-        // publishInquiryReceivedEvent(saved);
-        
         return mapper.toDTO(saved);
     }
 
@@ -118,14 +112,5 @@ public class InquiryService {
     public void deleteInquiry(String id) {
         log.info("Deleting inquiry with id: {}", id);
         repository.deleteById(id);
-    }
-
-    private void publishInquiryReceivedEvent(Inquiry inquiry) {
-        try {
-            kafkaTemplate.send("inquiry-events", "inquiry.received", inquiry);
-            log.info("Published inquiry.received event for inquiry: {}", inquiry.getId());
-        } catch (Exception e) {
-            log.warn("Failed to publish event for inquiry: {}", inquiry.getId(), e);
-        }
     }
 }

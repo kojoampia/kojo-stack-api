@@ -1,5 +1,6 @@
 package com.kojo.stack.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -28,7 +29,12 @@ public class AccountDTO implements Serializable {
     @Schema(description = "Email address", example = "admin@example.com")
     private String email;
 
-    @Schema(description = "Password", example = "admin123")
+    /**
+     * Accepted on create/update, never serialized back to a client.
+     * {@link com.kojo.stack.service.AccountService#toDTO} additionally refuses to populate it.
+     */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(description = "Password (write-only)", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String password;
 
     @Schema(description = "Set of authorities/roles")
@@ -49,10 +55,12 @@ public class AccountDTO implements Serializable {
     @Schema(description = "Image URL", example = "http://example.com/image.png")
     private String imageUrl;
 
-    @Schema(description = "Activation key", example = "abc123def456")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(description = "Activation key (write-only)", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String activationKey;
 
-    @Schema(description = "Reset key", example = "reset123def456")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Schema(description = "Reset key (write-only)", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String resetKey;
 
 

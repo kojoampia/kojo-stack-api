@@ -2,7 +2,7 @@
 
 ## Overview
 
-A fully-featured, production-ready Spring Boot 3.2 REST API backend for the Kojo.Stack enterprise consulting platform. Built with modern Java 21, featuring event-driven architecture, caching, comprehensive documentation, and enterprise-grade security.
+A production-ready Spring Boot 3.2 REST API backend for the Kojo.Stack consulting platform, built on Java 21 with MongoDB persistence, in-process caching, OpenAPI documentation, and stateless JWT security.
 
 ## Architecture
 
@@ -10,11 +10,11 @@ A fully-featured, production-ready Spring Boot 3.2 REST API backend for the Kojo
 
 - **Framework**: Spring Boot 3.2 (latest LTS)
 - **Language**: Java 21 (latest LTS)
-- **Database**: PostgreSQL (production), H2 (development)
-- **Caching**: Redis with Spring Cache
-- **Event Streaming**: Apache Kafka
+- **Database**: MongoDB (all environments)
+- **Caching**: Ehcache via the JSR-107 (JCache) Spring Cache abstraction
 - **API Documentation**: OpenAPI 3.0 / Swagger UI
-- **ORM**: Spring Data JPA / Hibernate
+- **Data Access**: Spring Data MongoDB
+- **Security**: Spring Security with stateless JWT (HS256)
 - **DTO Mapping**: MapStruct (compile-time safety)
 - **Logging**: SLF4J with Logback
 - **Build Tool**: Maven 3.9
@@ -37,8 +37,9 @@ kojo-stack-api/
 │   │   ├── exception/                  # Exception handling
 │   │   └── mapper/                     # DTO <-> Entity mapping
 │   ├── domain/                         # Domain Model Layer
-│   │   ├── model/                      # JPA Entities
-│   │   └── repository/                 # Data access layer
+│   │   └── model/                      # MongoDB documents (@Document)
+│   ├── repository/                     # Spring Data MongoDB repositories
+│   ├── security/                       # JWT provider, filter, user details
 │   └── service/                        # Business Logic Layer
 ├── src/main/resources/
 │   └── application.yml                 # Configuration file
@@ -52,34 +53,28 @@ kojo-stack-api/
 ### 1. Clean Architecture
 - **Separation of Concerns**: Controller → Service → Repository
 - **DTOs for API Contract**: MapStruct for type-safe mapping
-- **Domain-Driven Design**: Rich domain models with JPA
+- **Domain-Driven Design**: Rich domain models as MongoDB documents
 
 ### 2. Data Persistence
-- **Spring Data JPA**: Clean repository interfaces
-- **Hibernate**: ORM with relationship management
-- **PostgreSQL**: Production database
-- **H2**: In-memory database for development
-- **Liquibase/Flyway Ready**: Migration support
+- **Spring Data MongoDB**: Repository interfaces in `com.kojo.stack.repository`
+- **Documents**: `@Document` models with `String` ids in `domain/model`
+- **Schema**: managed by the application; there is no migration tool
+- **Seeding**: `DataInitConfig` loads `resources/data.json` when `app.db.init-data` is true (dev only)
 
 ### 3. Caching Layer
-- **Redis Integration**: High-performance distributed caching
+- **Ehcache**: in-process cache configured by `src/main/resources/ehcache.xml`
 - **Spring Cache Abstraction**: `@Cacheable`, `@CacheEvict` annotations
-- **TTL Configuration**: Time-to-live for cache entries
+- **Important**: every new cache name needs a matching `alias` in `ehcache.xml`
 
-### 4. Event-Driven Architecture
-- **Apache Kafka**: Real-time event streaming
-- **Event Publishing**: Project and Inquiry events
-- **Consumer Ready**: Template for event listeners
-- **JSON Serialization**: Spring Kafka JSON support
-
-### 5. REST API
-- **6 Feature Endpoints**:
-  - Experiences (CRUD + Search)
-  - Projects (CRUD + Filtering by type/client)
-  - Inquiries (Submit + Status management)
-  - Skills (Browse + Category filtering)
-  - Documentation (Full-text search + Tag filtering)
-  - Health (Liveness/Readiness probes)
+### 4. REST API
+All endpoints live under `/api/v1/**`:
+  - Projects, Experiences, Skills, Documentation, Education (public read, authenticated write)
+  - Profiles, Settings, KPIs (public read, authenticated write)
+  - Metrics (authenticated)
+  - Inquiries (public submit, admin read/manage)
+  - Accounts, Authorities (admin only)
+  - Auth (login, token validation)
+  - Health (liveness/readiness probes)
 
 ### 6. API Documentation
 - **OpenAPI 3.0**: Complete API specification
@@ -98,32 +93,31 @@ kojo-stack-api/
 - **Kubernetes Probes**: Liveness and readiness endpoints
 
 ### 9. Security
-- **CORS Configuration**: Configurable allowed origins
-- **HTTPS Ready**: SSL/TLS support
-- **Environment-based Config**: Secrets via environment variables
+- **Stateless JWT**: HS256, signing key supplied via the `JWT_SECRET` environment variable.
+  The application refuses to start if it is missing or shorter than 32 bytes.
+- **Method security**: `@EnableMethodSecurity` is required for the `@PreAuthorize`
+  annotations on the account, authority and inquiry endpoints to be enforced. Do not remove it.
+- **CORS Configuration**: origins from `app.security.cors-origins` (env `CORS_ORIGINS`)
+- **Environment-based Config**: secrets via environment variables, never in `application.yml`
 - **Non-root Container User**: Docker security best practice
 
 ## Quick Start
 
 ### Prerequisites
 
-- Java 21+
-- Maven 3.9+
+- Java 21 (the build targets release 21; a newer default JDK will fail to compile)
+- Maven 3.9+ (or the bundled `./mvnw`)
 - Docker & Docker Compose
-- PostgreSQL 16+ (for production)
-- Redis 7+ (for production)
-- Kafka 7.5+ (for production)
+- MongoDB 7+
 
-### Development (H2 In-Memory Database)
+### Development (local MongoDB)
 
 ```bash
-# Clone and build
-git clone <repo>
-cd kojo-stack-api
-mvn clean package
+# Build (runs the test suite)
+./mvnw clean package
 
-# Run application
-mvn spring-boot:run
+# Run application on port 8085 with seeded data
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Access API
 # Swagger UI: http://localhost:8080/swagger-ui.html
@@ -140,33 +134,48 @@ docker-compose up --build
 # Services:
 # - API: http://localhost:8080
 # - Swagger UI: http://localhost:8080/swagger-ui.html
-# - PostgreSQL: localhost:5432 (user: kojo, pass: kojo123)
-# - Redis: localhost:6379
-# - Kafka: localhost:9092
-# - Zookeeper: localhost:2181
+# - MongoDB: localhost:27017
 ```
 
 ### Environment Variables
 
 ```bash
 # Database
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=kojo_stack
-DB_USER=kojo
-DB_PASSWORD=<secure-password>
+MONGODB_HOST=mongodb
+MONGODB_PORT=27017
+MONGODB_DATABASE=kojo-stack
 
-# Cache
-REDIS_HOST=redis
-REDIS_PORT=6379
+# Security — both are REQUIRED; the application refuses to start without them
+JWT_SECRET=<at least 32 bytes; openssl rand -base64 48>
+ADMIN_PASSWORD=<at least 12 characters; openssl rand -base64 24>
 
-# Event Streaming
-KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+# Site administrator (optional overrides)
+ADMIN_LOGIN=admin
+ADMIN_EMAIL=admin@example.com
+
+# CORS — comma-separated; empty means same-origin only
+CORS_ORIGINS=https://jojoaddison.net
 
 # Application
 SPRING_PROFILES_ACTIVE=prod
 SERVER_PORT=8080
 ```
+
+### The site administrator account
+
+There is exactly one administrator, and it is **not** stored in `data.json` or any seed
+script. `AdminAccountInitializer` reconciles it from the environment on every start:
+
+| State on startup | Action |
+|---|---|
+| No account with `ADMIN_LOGIN` | Created with `ADMIN_PASSWORD`, granted `ROLE_ADMIN` + `ROLE_USER` |
+| Account exists, password differs | Password re-encoded and updated; reset/activation keys cleared |
+| Account exists, password matches | Nothing written |
+
+**To rotate the credential:** change `ADMIN_PASSWORD` in the environment and restart the API.
+
+This runs in every profile, including `prod` — unlike `DataInitConfig`, which seeds
+portfolio content only under `!prod`.
 
 ## API Endpoints
 
@@ -238,10 +247,10 @@ mvn test
 mvn verify
 ```
 
-### With Testcontainers
+### Running a single test
 ```bash
-# PostgreSQL integration tests with real database
-mvn verify -Dgroups=integration
+./mvnw test -Dtest=SecurityAccessTest
+./mvnw test -Dtest=AccountServiceTest#getAllDoesNotLeakPassword
 ```
 
 ## Building Docker Image
@@ -316,12 +325,12 @@ http://localhost:8080/actuator/health/readinessState
 ## Configuration Management
 
 ### Application Profiles
-- **dev**: H2 database, detailed logging, CORS all origins
-- **prod**: PostgreSQL, optimized logging, strict CORS
+- **dev**: local MongoDB on port 8085, verbose logging, seeded data, throwaway JWT secret
+- **prod**: MongoDB via `MONGODB_HOST`, minimal logging, `JWT_SECRET` required
 
 ### Override via Environment
 ```bash
-SPRING_DATASOURCE_URL=jdbc:postgresql://host:5432/db
+SPRING_DATA_MONGODB_URI=mongodb://host:27017/kojo-stack
 SPRING_REDIS_HOST=redis-host
 LOGGING_LEVEL_COM_KOJO_STACK=DEBUG
 ```
@@ -361,32 +370,24 @@ LOGGING_LEVEL_COM_KOJO_STACK=DEBUG
 
 ### Database Connection Issues
 ```bash
-# Check PostgreSQL
-docker exec kojo-stack-postgres psql -U kojo -d kojo_stack
+# Check MongoDB
+docker exec kojo-stack-db mongosh kojo-stack --eval 'db.runCommand({ping:1})'
 
 # Check logs
 docker logs kojo-stack-api
 ```
 
-### Redis Cache Issues
+### Application refuses to start
 ```bash
-# Test Redis connection
-docker exec kojo-stack-redis redis-cli ping
-
-# Clear cache
-docker exec kojo-stack-redis redis-cli FLUSHALL
+# "app.jwtSecret is not configured" means JWT_SECRET is unset or under 32 bytes.
+# Generate one with:
+openssl rand -base64 48
 ```
 
-### Kafka Message Issues
+### Cache Issues
 ```bash
-# List topics
-docker exec kojo-stack-kafka kafka-topics \
-  --list --bootstrap-server localhost:9092
-
-# Monitor topics
-docker exec kojo-stack-kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic project-events --from-beginning
+# Ehcache is in-process: restarting the container clears every cache.
+# A @Cacheable name with no matching alias in ehcache.xml fails at startup.
 ```
 
 ## Contributing

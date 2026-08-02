@@ -1,3 +1,8 @@
+> NOTE: This is the original scaffolding brief, kept for context. It describes the intended
+> stack, not the built one. As of 2026-08 the API runs Spring Boot 3.2 (not 4), and Kafka and
+> WebSocket/STOMP were never wired up end-to-end — Kafka has since been removed entirely.
+> Do not reintroduce them on the strength of this document alone.
+
 Project Prompt: Kojo.Stack (Enterprise DevOps Portfolio)
 Role & Objective
 Act as a Senior Fullstack Architect. Your task is to scaffold a robust, enterprise-grade web application named "Kojo.Stack" using api.java from the project folder.

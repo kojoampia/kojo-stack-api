@@ -9,7 +9,7 @@
 ## Architecture
 - The application is a Spring Boot 3.2 API on Java 21 with a controller -> service -> repository structure.
 - Keep new business logic in `service` classes, keep controllers thin, and keep persistence logic in Spring Data repositories.
-- Domain documents live under `src/main/java/com/kojo/stack/domain/model` and repositories for active code live under `src/main/java/com/kojo/stack/domain/repository`.
+- Domain documents live under `src/main/java/com/kojo/stack/domain/model` and repositories live under `src/main/java/com/kojo/stack/repository`. There is no `domain/repository` package.
 - Use MapStruct mappers in `src/main/java/com/kojo/stack/api/mapper` when translating between DTOs and domain models.
 - Security is stateless JWT-based. Check `SecurityConfig`, `JwtAuthenticationFilter`, and `JwtTokenProvider` before changing endpoint access.
 
@@ -27,8 +27,8 @@
 
 ## Known Pitfalls
 - Treat `pom.xml` and the Spring config files as the source of truth when README content conflicts with the codebase.
-- Avoid adding new code to the legacy JHipster remnants under `src/main/java/com/kojo/stack/repository` and `src/main/java/com/kojo/stack/api/errors` unless you are explicitly refactoring them.
-- There are duplicate legacy and active domain/repository classes in a few areas, so verify imports carefully before editing `Authority`, `User`, or repository types.
+- `src/main/java/com/kojo/stack/repository` is the active repository package, not a legacy remnant. `src/main/java/com/kojo/stack/api/errors` is empty.
+- There are no duplicate `Authority`/`User` types: `domain/model/Authority.java` is the only authority class and there is no `User` class (accounts are modelled by `Account`).
 - `SECURITY_CONFIG.md` is useful context, but the implemented JWT algorithm and some access behavior should be verified against the source code before changing security-sensitive logic.
 
 ## Key Files

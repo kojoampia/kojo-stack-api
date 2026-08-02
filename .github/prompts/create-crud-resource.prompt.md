@@ -15,13 +15,12 @@ Inputs to infer or ask from the user argument:
 
 Required implementation rules:
 - Follow the active controller -> service -> repository flow used by this project.
-- Persist using MongoDB documents in `src/main/java/com/kojo/stack/domain/model` and active repositories in `src/main/java/com/kojo/stack/domain/repository`.
+- Persist using MongoDB documents in `src/main/java/com/kojo/stack/domain/model` and repositories in `src/main/java/com/kojo/stack/repository`.
 - Use `ResponseEntity` in controllers and keep controllers thin.
 - Put business logic in a dedicated service with the existing transaction pattern.
 - Add DTOs and MapStruct mappers when the API contract should not expose the raw domain model directly.
 - Keep routes under `/api/v1/**`.
-- Avoid legacy JHipster remnants under `src/main/java/com/kojo/stack/repository` and `src/main/java/com/kojo/stack/api/errors` unless the task explicitly requires refactoring them.
-- Verify imports carefully where duplicate legacy and active classes exist.
+- `src/main/java/com/kojo/stack/repository` is the active repository package; `api/errors` is empty and there are no duplicate legacy classes to disambiguate.
 - If you add caching, update `src/main/resources/ehcache.xml` in the same change.
 - If security behavior is affected, check `SecurityConfig`, `JwtAuthenticationFilter`, `JwtTokenProvider`, and method-level annotations before finalizing the change.
 

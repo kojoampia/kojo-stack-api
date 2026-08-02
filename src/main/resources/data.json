@@ -1,36 +1,29 @@
 {
   "authorities": [
-    { "name": "ROLE_ADMIN" },
-    { "name": "ROLE_USER" },
-    { "name": "ROLE_ANONYMOUS" },
-    { "name": "ROLE_VIEWER" }
-  ],
-  "accounts": [
     {
-      "firstName": "Kojo",
-      "lastName": "Ampia-Addison",
-      "email": "kojo.ampia@jojoaddison.net",
-      "password": "***REMOVED-CREDENTIAL***",
-      "authorities": [
-        { "name": "ROLE_ADMIN" },
-        { "name": "ROLE_USER" }
-      ],
-      "activated": true,
-      "langKey": "EN",
-      "imageUrl": "assets/kojo-ampia-addison.jpeg",
-      "login":"kojo"
+      "name": "ROLE_ADMIN"
+    },
+    {
+      "name": "ROLE_USER"
+    },
+    {
+      "name": "ROLE_ANONYMOUS"
+    },
+    {
+      "name": "ROLE_VIEWER"
     }
   ],
-   "profiles":[
-     {
-    "name": "John Kojo Ampia-Addison",
-    "title": "Senior Software Architect & DevOps Engineer",
-    "email": "kojo.ampia@jojoaddison.net",
-    "phone": "+43 676 922 1796",
-    "location": "Heinrich-von-Buol-Gasse 14/3/6, 1210 Vienna, Austria",
-    "avatar": "assets/kojo-ampia-addison.jpeg"
+  "accounts": [],
+  "profiles": [
+    {
+      "name": "John Kojo Ampia-Addison",
+      "title": "Senior Software Architect & DevOps Engineer",
+      "email": "kojo.ampia@jojoaddison.net",
+      "phone": "+43 676 922 1796",
+      "location": "Heinrich-von-Buol-Gasse 14/3/6, 1210 Vienna, Austria",
+      "avatar": "assets/kojo-ampia-addison.jpeg"
     }
-   ],
+  ],
   "experiences": [
     {
       "company": "Bundesrechenzentrum (BRZ)",
@@ -38,11 +31,30 @@
       "period": "07/2024 - 03/2026",
       "status": "COMPLETED",
       "description": "Refactoring core APIs and designing GitOps infrastructure. Implementing OpenTelemetry for full system observability.",
-      "stack": ["Java 21", "Spring Boot", "OpenTelemetry", "Kubernetes", "DB2", "Grafana"],
+      "stack": [
+        "Java 21",
+        "Spring Boot",
+        "OpenTelemetry",
+        "Kubernetes",
+        "DB2",
+        "Grafana"
+      ],
       "metrics": [
-        { "label": "API Availability", "value": "99.95%", "trend": "up" },
-        { "label": "Latency", "value": "<50ms", "trend": "stable" },
-        { "label": "Deploys/Week", "value": "15+", "trend": "up" }
+        {
+          "label": "API Availability",
+          "value": "99.95%",
+          "trend": "up"
+        },
+        {
+          "label": "Latency",
+          "value": "<50ms",
+          "trend": "stable"
+        },
+        {
+          "label": "Deploys/Week",
+          "value": "15+",
+          "trend": "up"
+        }
       ]
     },
     {
@@ -51,10 +63,24 @@
       "period": "03/2022 - Present",
       "status": "ACTIVE",
       "description": "Led development of a Near-Real Time communication brokerage platform for mobile health services.",
-      "stack": ["JHipster", "Kafka", "MongoDB", "Angular 17", "Docker"],
+      "stack": [
+        "JHipster",
+        "Kafka",
+        "MongoDB",
+        "Angular 17",
+        "Docker"
+      ],
       "metrics": [
-        { "label": "Msg Throughput", "value": "5k/sec", "trend": "up" },
-        { "label": "Users", "value": "Scaling", "trend": "up" }
+        {
+          "label": "Msg Throughput",
+          "value": "5k/sec",
+          "trend": "up"
+        },
+        {
+          "label": "Users",
+          "value": "Scaling",
+          "trend": "up"
+        }
       ]
     },
     {
@@ -63,10 +89,24 @@
       "period": "06/2022 - 08/2023",
       "status": "STABLE",
       "description": "Application Migration to OpenShift PaaS. Designed custom metrics for SLI/SLO monitoring using PromQL.",
-      "stack": ["OpenShift", "Helm", "Jenkins", "Prometheus", "ELK Stack"],
+      "stack": [
+        "OpenShift",
+        "Helm",
+        "Jenkins",
+        "Prometheus",
+        "ELK Stack"
+      ],
       "metrics": [
-        { "label": "Migration", "value": "100%", "trend": "stable" },
-        { "label": "SLO Target", "value": "Met", "trend": "stable" }
+        {
+          "label": "Migration",
+          "value": "100%",
+          "trend": "stable"
+        },
+        {
+          "label": "SLO Target",
+          "value": "Met",
+          "trend": "stable"
+        }
       ]
     },
     {
@@ -75,9 +115,18 @@
       "period": "08/2020 - 12/2022",
       "status": "STABLE",
       "description": "Developed Owasp T10 compliant web application with dashboards for Operations and Business Admin.",
-      "stack": ["Java 11", "Microservices", "Spring Security", "Angular 10"],
+      "stack": [
+        "Java 11",
+        "Microservices",
+        "Spring Security",
+        "Angular 10"
+      ],
       "metrics": [
-        { "label": "Security Score", "value": "A+", "trend": "up" }
+        {
+          "label": "Security Score",
+          "value": "A+",
+          "trend": "up"
+        }
       ]
     },
     {
@@ -86,9 +135,18 @@
       "period": "02/2019 - 10/2021",
       "status": "DEPRECATED",
       "description": "Ticketshop Operations Monitoring. Built dashboards using Elastic Stack and customized alert configurations.",
-      "stack": ["Elasticsearch", "Grafana", "OracleDB", "Angular"],
+      "stack": [
+        "Elasticsearch",
+        "Grafana",
+        "OracleDB",
+        "Angular"
+      ],
       "metrics": [
-        { "label": "Uptime", "value": "99.9%", "trend": "stable" }
+        {
+          "label": "Uptime",
+          "value": "99.9%",
+          "trend": "stable"
+        }
       ]
     }
   ],
@@ -127,7 +185,13 @@
       "client": "Abofonsa Mobile Health",
       "type": "MICROSERVICES",
       "description": "Near-real time communication brokerage using Kafka streams for mobile health data processing.",
-      "stack": ["Java 17", "Kafka", "MongoDB", "JHipster", "Angular 17"],
+      "stack": [
+        "Java 17",
+        "Kafka",
+        "MongoDB",
+        "JHipster",
+        "Angular 17"
+      ],
       "status": "LIVE",
       "architecture": "Event-Driven",
       "startDate": "2022-03-01"
@@ -137,7 +201,12 @@
       "client": "BRZ",
       "type": "DEVOPS",
       "description": "Infrastructure as Code design and OpenTelemetry integration for federal computing services.",
-      "stack": ["Kubernetes", "ArgoCD", "OpenTelemetry", "Java 21"],
+      "stack": [
+        "Kubernetes",
+        "ArgoCD",
+        "OpenTelemetry",
+        "Java 21"
+      ],
       "status": "LIVE",
       "architecture": "Cloud Native",
       "startDate": "2024-07-01"
@@ -147,7 +216,12 @@
       "client": "Bedrock Insurance",
       "type": "MICROSERVICES",
       "description": "Secure policy management dashboards and public facing website compliant with OWASP Top 10 standards.",
-      "stack": ["Spring Security", "Angular 10", "JWT", "Netflix OSS"],
+      "stack": [
+        "Spring Security",
+        "Angular 10",
+        "JWT",
+        "Netflix OSS"
+      ],
       "status": "MAINTENANCE",
       "architecture": "Microservices",
       "startDate": "2020-08-01",
@@ -158,7 +232,12 @@
       "client": "Accenture",
       "type": "MIGRATION",
       "description": "Large-scale migration of legacy applications to OpenShift PaaS with custom SLI/SLO monitoring.",
-      "stack": ["OpenShift", "Helm", "PromQL", "Groovy"],
+      "stack": [
+        "OpenShift",
+        "Helm",
+        "PromQL",
+        "Groovy"
+      ],
       "status": "COMPLETED",
       "architecture": "Hybrid Cloud",
       "startDate": "2022-06-01",
@@ -169,7 +248,11 @@
       "client": "ÖBB",
       "type": "MONITORING",
       "description": "High-availability monitoring solution for national rail ticketing operations using Elastic Stack.",
-      "stack": ["Elasticsearch", "Grafana", "OracleDB"],
+      "stack": [
+        "Elasticsearch",
+        "Grafana",
+        "OracleDB"
+      ],
       "status": "COMPLETED",
       "architecture": "Observability",
       "startDate": "2019-02-01",
@@ -180,7 +263,12 @@
       "client": "T-Mobile Austria",
       "type": "ETL",
       "description": "Optimization of routine operations for the Interconnection Billing Process implementation on Mediation Zone.",
-      "stack": ["Java 6", "Oracle DB", "PL/SQL", "Cognos"],
+      "stack": [
+        "Java 6",
+        "Oracle DB",
+        "PL/SQL",
+        "Cognos"
+      ],
       "status": "COMPLETED",
       "architecture": "Legacy",
       "startDate": "2010-01-01",
@@ -192,7 +280,11 @@
       "id": "ADR-2024-001",
       "title": "Event-Driven Architecture Strategy",
       "type": "ADR",
-      "tags": ["Kafka", "Microservices", "Architecture"],
+      "tags": [
+        "Kafka",
+        "Microservices",
+        "Architecture"
+      ],
       "content": "Decided to implement Kafka for decoupling services and enabling event-driven communication across the platform.",
       "lastUpdated": "2024-03-15"
     },
@@ -200,7 +292,11 @@
       "id": "ARCH-2024-002",
       "title": "Microservices Design Patterns",
       "type": "Architecture",
-      "tags": ["Spring Boot", "Kubernetes", "Design Patterns"],
+      "tags": [
+        "Spring Boot",
+        "Kubernetes",
+        "Design Patterns"
+      ],
       "content": "Documentation on implementing circuit breakers, saga patterns, and distributed tracing in microservices.",
       "lastUpdated": "2024-06-10"
     },
@@ -208,7 +304,11 @@
       "id": "OPS-2024-003",
       "title": "Kubernetes Deployment Guide",
       "type": "Operations",
-      "tags": ["Kubernetes", "Docker", "DevOps"],
+      "tags": [
+        "Kubernetes",
+        "Docker",
+        "DevOps"
+      ],
       "content": "Complete guide for deploying Spring Boot applications on Kubernetes with auto-scaling and health checks.",
       "lastUpdated": "2024-09-20"
     }
@@ -220,81 +320,179 @@
       "theme": "light",
       "language": "en"
     }
-
   ],
   "tech_skills": [
-    { "name": "Java 8/11/17/21", "category": "Backend", "level": 100, "icon": "java" },
-    { "name": "Spring Boot & Cloud", "category": "Backend", "level": 95, "icon": "leaf" },
-    { "name": "Microservices", "category": "Backend", "level": 90, "icon": "network-wired" },
-    { "name": "JHipster", "category": "Backend", "level": 90, "icon": "rocket" },   
-    { "name": "Angular (10-17+)", "category": "Frontend", "level": 95, "icon": "angular" },
-    { "name": "TypeScript", "category": "Frontend", "level": 90, "icon": "code" },    
-    { "name": "Kubernetes & Helm", "category": "DevOps", "level": 95, "icon": "dharmachakra" },
-    { "name": "Docker", "category": "DevOps", "level": 95, "icon": "docker" },
-    { "name": "Jenkins CI/CD", "category": "DevOps", "level": 90, "icon": "cogs" },
-    { "name": "OpenShift", "category": "DevOps", "level": 85, "icon": "cloud" },  
-    { "name": "Apache Kafka", "category": "Data", "level": 90, "icon": "stream" },
-    { "name": "Elasticsearch/ELK", "category": "Data", "level": 85, "icon": "search" },
-    { "name": "SQL (Postgres/Oracle)", "category": "Data", "level": 90, "icon": "database" },
-    { "name": "MongoDB", "category": "Data", "level": 90, "icon": "leaf" }
+    {
+      "name": "Java 8/11/17/21",
+      "category": "Backend",
+      "level": 100,
+      "icon": "java"
+    },
+    {
+      "name": "Spring Boot & Cloud",
+      "category": "Backend",
+      "level": 95,
+      "icon": "leaf"
+    },
+    {
+      "name": "Microservices",
+      "category": "Backend",
+      "level": 90,
+      "icon": "network-wired"
+    },
+    {
+      "name": "JHipster",
+      "category": "Backend",
+      "level": 90,
+      "icon": "rocket"
+    },
+    {
+      "name": "Angular (10-17+)",
+      "category": "Frontend",
+      "level": 95,
+      "icon": "angular"
+    },
+    {
+      "name": "TypeScript",
+      "category": "Frontend",
+      "level": 90,
+      "icon": "code"
+    },
+    {
+      "name": "Kubernetes & Helm",
+      "category": "DevOps",
+      "level": 95,
+      "icon": "dharmachakra"
+    },
+    {
+      "name": "Docker",
+      "category": "DevOps",
+      "level": 95,
+      "icon": "docker"
+    },
+    {
+      "name": "Jenkins CI/CD",
+      "category": "DevOps",
+      "level": 90,
+      "icon": "cogs"
+    },
+    {
+      "name": "OpenShift",
+      "category": "DevOps",
+      "level": 85,
+      "icon": "cloud"
+    },
+    {
+      "name": "Apache Kafka",
+      "category": "Data",
+      "level": 90,
+      "icon": "stream"
+    },
+    {
+      "name": "Elasticsearch/ELK",
+      "category": "Data",
+      "level": 85,
+      "icon": "search"
+    },
+    {
+      "name": "SQL (Postgres/Oracle)",
+      "category": "Data",
+      "level": 90,
+      "icon": "database"
+    },
+    {
+      "name": "MongoDB",
+      "category": "Data",
+      "level": 90,
+      "icon": "leaf"
+    }
   ],
   "education": [
     {
       "institution": "Computer, Munich - Germany",
-      "subjects": ["Monitoring and Security"],
+      "subjects": [
+        "Monitoring and Security"
+      ],
       "type": "Professional Workshop",
       "duration": "June, 2019"
     },
     {
       "institution": "Thales Group, Vienna - Austria",
-      "subjects": ["Data Security and Privacy"],
+      "subjects": [
+        "Data Security and Privacy"
+      ],
       "type": "Professional Study",
       "duration": "June, 2017"
     },
     {
       "institution": "Thales Group, Vienna - Austria",
-      "subjects": ["Railway Signaling and Control"],
+      "subjects": [
+        "Railway Signaling and Control"
+      ],
       "type": "Professional Workshop",
       "duration": "June, 2016"
     },
     {
       "institution": "Thales Group, Vienna - Austria",
-      "subjects": ["Cyber Security"],
+      "subjects": [
+        "Cyber Security"
+      ],
       "type": "Professional Study",
       "duration": "June, 2015"
     },
     {
       "institution": "University of Technology (TU Wien), Vienna - Austria",
-      "subjects": ["Computer Science", "Economics"],
+      "subjects": [
+        "Computer Science",
+        "Economics"
+      ],
       "type": "University Bachelor Education",
       "duration": "October, 2004 - June 2010"
     },
     {
       "institution": "Vorstudienlehrgang der Wieneruniversitäten, Vienna - Austria",
-      "subjects": ["Mathematics", "Physics", "German"],
+      "subjects": [
+        "Mathematics",
+        "Physics",
+        "German"
+      ],
       "type": "Pre University School",
       "duration": "October, 2002 - June 2004"
     },
     {
       "institution": "Mfantsipim School, Cape Coast - Ghana",
-      "subjects": ["Mathematics", "Geography", "Economics", "General Paper"],
+      "subjects": [
+        "Mathematics",
+        "Geography",
+        "Economics",
+        "General Paper"
+      ],
       "type": "Secondary Advance Level",
       "duration": "October, 1993 - June 1995"
     },
     {
       "institution": "Mfantsipim School, Cape Coast - Ghana",
-      "subjects": ["Advanced Mathematics", "Physics", "Mathematics", "Chemistry", "Biology", "English", "Technical Drawing", "Geography"],
+      "subjects": [
+        "Advanced Mathematics",
+        "Physics",
+        "Mathematics",
+        "Chemistry",
+        "Biology",
+        "English",
+        "Technical Drawing",
+        "Geography"
+      ],
       "type": "Secondary GCE Ordinary Level",
       "duration": "September, 1987 - June 1992"
     }
   ],
   "metrics": [
     {
-      "label":"API Availability",
-      "value":"100%",
-      "trend":"stable",
-      "category":"Backend",
-      "description":"Application Migration to OpenShift PaaS. Designed custom metrics for SLI/SLO monitoring using PromQL."
+      "label": "API Availability",
+      "value": "100%",
+      "trend": "stable",
+      "category": "Backend",
+      "description": "Application Migration to OpenShift PaaS. Designed custom metrics for SLI/SLO monitoring using PromQL."
     }
   ],
   "kpis": [

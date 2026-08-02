@@ -28,7 +28,7 @@ Drift checks to include:
 Guardrails:
 - Avoid introducing mapping logic inside controllers.
 - Keep business decisions in services; mapper logic should remain transformation-focused.
-- Verify duplicate legacy/active classes before imports (`Authority`, `User`).
+- Note there is a single `Authority` type in `domain/model` and no `User` class; accounts are modelled by `Account`.
 
 Return:
 1. Mapper and DTO files changed

@@ -6,10 +6,10 @@ applyTo: "src/main/java/**/*.java"
 # Backend Java API Guidelines
 
 - Treat `pom.xml`, `application.yml`, and the active Spring classes as the source of truth when README content disagrees with the codebase.
-- Keep the main flow as controller -> service -> repository. Put request handling in `api/controller`, business logic in `service`, and persistence in `domain/repository`.
+- Keep the main flow as controller -> service -> repository. Put request handling in `api/controller`, business logic in `service`, and persistence in `repository` (package `com.kojo.stack.repository`).
 - Use MongoDB patterns, not JPA patterns: new persisted models belong in `domain/model`, use `@Document`, prefer `String` ids, and extend `MongoRepository` in active repositories.
-- Do not add new application code to the legacy JHipster remnants under `src/main/java/com/kojo/stack/repository` or `src/main/java/com/kojo/stack/api/errors` unless the task is explicitly refactoring those areas.
-- Check imports carefully for duplicate legacy and active types, especially `Authority`, `User`, and repository classes.
+- `src/main/java/com/kojo/stack/repository` holds the active repositories; add new ones there. `src/main/java/com/kojo/stack/api/errors` is an empty directory.
+- There are no duplicate `Authority`/`User` types to disambiguate; `domain/model/Authority.java` is the only one and accounts are modelled by `Account`.
 - Keep controllers thin and return `ResponseEntity`. Keep endpoints under `/api/v1/**` unless the task clearly requires a new version boundary.
 - Put write logic behind services annotated with `@Transactional`; keep class-level `@Transactional(readOnly = true)` when following the existing service pattern.
 - Prefer constructor injection through Lombok `@RequiredArgsConstructor`; do not introduce field injection.

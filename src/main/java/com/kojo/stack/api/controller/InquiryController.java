@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,18 +26,21 @@ public class InquiryController {
     private final InquiryService service;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all inquiries", description = "Retrieve all consulting inquiries (admin only)")
     public ResponseEntity<List<InquiryDTO>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/new")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get new inquiries")
     public ResponseEntity<List<InquiryDTO>> getNewInquiries() {
         return ResponseEntity.ok(service.getNewInquiries());
     }
 
     @GetMapping("/type/{type}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get inquiries by type")
     public ResponseEntity<List<InquiryDTO>> getByType(@PathVariable String type) {
         return ResponseEntity.ok(service.getByType(type));
@@ -49,12 +53,14 @@ public class InquiryController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update inquiry")
     public ResponseEntity<InquiryDTO> update(@PathVariable String id, @Valid @RequestBody InquiryDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update inquiry status")
     public ResponseEntity<InquiryDTO> updateStatus(
             @PathVariable String id,
@@ -63,6 +69,7 @@ public class InquiryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete inquiry")
     public ResponseEntity<Void> deleteInquiry(@PathVariable String id) {
         service.deleteInquiry(id);

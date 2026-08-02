@@ -13,7 +13,7 @@ Focus areas:
 - Public versus protected `/api/v1/**` behavior
 - JWT secret, expiry, and algorithm assumptions from `application.yml` and code
 - Exposure through Swagger, Actuator, or health endpoints
-- Risk from stale legacy packages or duplicate domain/repository classes
+- Whether `@EnableMethodSecurity` is still present: without it every `@PreAuthorize` in this codebase is silently ignored
 - Missing or insufficient tests for authentication and authorization behavior
 
 Project-specific review rules:

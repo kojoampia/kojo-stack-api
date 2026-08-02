@@ -18,7 +18,7 @@ pipeline {
 
     stages {
         /**
-        Checkout not necessary in this build 
+        Checkout not necessary in this build
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/kojoampia/kojo-stack-api.git',
@@ -26,6 +26,18 @@ pipeline {
                 credentialsId: GIT_CREDENTIALS_ID
             }
         }**/
+        stage('Test') {
+            steps {
+                // The Docker build below runs with -DskipTests, so this is the only
+                // place the suite executes. A failure here must stop the pipeline.
+                sh './mvnw -B clean test'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: false, testResults: 'target/surefire-reports/*.xml'
+                }
+            }
+        }
         stage('Build and Push Docker Image') {
             steps {
                 script {

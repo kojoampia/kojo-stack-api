@@ -13,7 +13,7 @@ Inputs to infer from the user argument:
 - Expected access frequency and cardinality for index recommendations
 
 Implementation requirements:
-- Use active repositories under `src/main/java/com/kojo/stack/domain/repository`.
+- Put repositories under `src/main/java/com/kojo/stack/repository` (there is no `domain/repository` package).
 - Extend `MongoRepository<Entity, String>` unless there is a justified existing pattern to follow.
 - Prefer Spring Data derived query methods first.
 - Use `@Query` only when method naming becomes unreadable or cannot express the required filter.

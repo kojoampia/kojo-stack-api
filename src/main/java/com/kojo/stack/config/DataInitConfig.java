@@ -114,7 +114,18 @@ public class DataInitConfig {
         authorityRepository.saveAll(authorities);
     }
 
+    /**
+     * Seeds non-admin accounts only. The site administrator is created and rotated by
+     * {@link AdminAccountInitializer} from the environment, so no credential is stored
+     * in {@code data.json}; the accounts array there is empty by design.
+     *
+     * Accounts are only cleared when the seed file actually carries some, otherwise a
+     * restart would delete the administrator this application depends on.
+     */
     private void initializeAccounts(JsonNode accountsNode) {
+        if (!accountsNode.isArray() || accountsNode.isEmpty()) {
+            return;
+        }
         accountRepository.deleteAll();
         for (JsonNode node : accountsNode) {
             Set<Authority> authorities = new HashSet<>();

@@ -179,11 +179,12 @@ public class AccountService {
                     .collect(Collectors.toSet());
         }
         
+        // Deliberately omits password, activationKey and resetKey: outbound DTOs must never
+        // carry credential material, independently of the write-only Jackson annotations.
         return AccountDTO.builder()
                 .id(entity.getId())
                 .login(entity.getLogin())
                 .email(entity.getEmail())
-                .password(entity.getPassword())
                 .authorities(authorityDTOs)
                 .activated(entity.isActivated())
                 .firstName(entity.getFirstName())

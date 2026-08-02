@@ -3,6 +3,7 @@ package com.kojo.stack.security;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * JwtAuthenticationFilter - Extracts JWT from request headers and validates it
@@ -33,16 +36,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 String username = tokenProvider.getUsernameFromToken(jwt);
 
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(username, null, null);
-                
+                // Carry the authorities from the token into the context; without them every
+                // @PreAuthorize and hasRole() check would deny even legitimate admins.
+                List<SimpleGrantedAuthority> authorities = tokenProvider.getAuthoritiesFromToken(jwt).stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 // Set authentication in SecurityContext (stateless)
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                
-                log.debug("Set authentication for user: {}", username);
+
+                log.debug("Set authentication for user: {} with authorities: {}", username, authorities);
             }
         } catch (Exception ex) {
             log.error("Could not set user authentication in security context", ex);
