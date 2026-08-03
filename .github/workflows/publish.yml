@@ -1,0 +1,153 @@
+name: Publish image (GHCR)
+
+# Builds the same image the Dockerfile builds locally, but on a GitHub runner, and pushes it to this
+# repository's GitHub Container Registry namespace (ghcr.io/<owner>/kojo-stack-api) instead of the
+# private docker.jojoaddison.net one.
+#
+# GHCR authenticates with the automatic GITHUB_TOKEN, so this needs no configured secrets and does
+# not depend on docker.jojoaddison.net being reachable from a hosted runner.
+#
+# Nothing here touches a production server. Releasing stays a deliberate, human-run step, from the
+# kojo-stack-ci repository:
+#
+#   ./deploy/deploy.sh --channel github                    # deploy the current pins
+#   API_TAG=<sha> ./deploy/deploy.sh --channel github      # roll back to any published tag
+#
+# Two images, not one: this repository builds only the Angular frontend. The API image is published
+# by the same workflow in kojo-stack-api-api.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch: # publish any branch on demand, e.g. to test a change on the server first
+
+# Serialise per ref and never cancel a run mid-push. A cancelled push can leave a manifest
+# referencing blobs it never finished uploading, which the deploy script would then see as a
+# published tag that fails to pull.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: kojo-stack-api
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # what pushing to ghcr.io with GITHUB_TOKEN requires
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image tags
+        id: meta
+        run: |
+          set -euo pipefail
+
+          # GHCR namespaces are case-sensitive and must be lowercase; the owner name is not
+          # guaranteed to be, so fold it.
+          OWNER="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          REPO="ghcr.io/${OWNER}/kojo-stack-api"
+
+          # The fixed 7-char prefix of GITHUB_SHA depends on nothing, unlike `git rev-parse --short`
+          # whose length is object-count dependent and can differ on a shallow runner clone.
+          SHA_TAG="${GITHUB_SHA:0:7}"
+          EXTRA=()
+
+          # `latest` moves only on a default-branch build — never on a workflow_dispatch of a feature branch.
+          if [[ "${GITHUB_REF}" == "refs/heads/${{ github.event.repository.default_branch }}" ]]; then
+            EXTRA+=("latest")
+          fi
+
+          # A pushed release tag (v1.2.3) becomes an image tag of the same name.
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            EXTRA+=("${GITHUB_REF#refs/tags/}")
+          fi
+
+          {
+            echo "repo=${REPO}"
+            echo "sha_tag=${SHA_TAG}"
+            echo "all_tags=$(IFS=,; echo "${SHA_TAG}${EXTRA[@]+,${EXTRA[*]}}")"
+          } >> "$GITHUB_OUTPUT"
+
+          # build-push-action wants newline-separated fully-qualified references.
+          {
+            echo "tags<<EOF"
+            for t in "${SHA_TAG}" ${EXTRA[@]+"${EXTRA[@]}"}; do echo "${REPO}:${t}"; done
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Publishing:"
+          for t in "${SHA_TAG}" ${EXTRA[@]+"${EXTRA[@]}"}; do echo "  ${REPO}:${t}"; done
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The Dockerfile builds with -DskipTests. ci.yml is the gate that runs the 61 tests;
+      # this job assumes it passed on the same commit.
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # A push is not published until the registry serves it. Assert every tag resolves so a run that
+      # reports success but leaves a tag unresolvable fails here, not at deploy time. Retried, because
+      # a registry may serve a manifest a moment after accepting it — but bounded.
+      - name: Verify every tag resolves in the registry
+        env:
+          REPO: ${{ steps.meta.outputs.repo }}
+          ALL_TAGS: ${{ steps.meta.outputs.all_tags }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+          for t in $(tr ',' ' ' <<<"$ALL_TAGS"); do
+            resolved=false
+            for attempt in 1 2 3 4 5 6; do
+              if docker buildx imagetools inspect "${REPO}:${t}" >/dev/null 2>&1; then
+                resolved=true
+                break
+              fi
+              sleep 5
+            done
+            if $resolved; then
+              echo "ok      ${REPO}:${t}"
+            else
+              echo "MISSING ${REPO}:${t}"
+              missing+=("$t")
+            fi
+          done
+
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "::error::the build reported success, but these tags do not resolve in the registry: ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Summary
+        env:
+          REPO: ${{ steps.meta.outputs.repo }}
+          ALL_TAGS: ${{ steps.meta.outputs.all_tags }}
+          SHA_TAG: ${{ steps.meta.outputs.sha_tag }}
+        run: |
+          {
+            echo "### kojo-stack-api"
+            echo ""
+            echo '```'
+            tr ',' '\n' <<<"$ALL_TAGS" | sed "s|^|${REPO}:|"
+            echo '```'
+            echo ""
+            echo "Deploy from kojo-stack-ci with: \`API_TAG=${SHA_TAG} ./deploy/deploy.sh --channel github\`"
+          } >> "$GITHUB_STEP_SUMMARY"
